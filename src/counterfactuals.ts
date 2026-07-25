@@ -16,10 +16,16 @@ import { gini } from "./signals.js";
  * - GININORM: weight^(1 - G) where G is the Gini of weights cast so far.
  *             Dampening scales with measured inequality: at G=0 it is 1T1V,
  *             as G->1 it approaches 1W1V.
+ *             NOTE: GININORM is EXPERIMENTAL (July 2026). The primary
+ *             mechanism is tiered rule *selection* (see Snapshot.
+ *             recommendedRule). Label accordingly in any submission material.
  *
  * MVP scope: ballots are tallied head-to-head via their primary choice
  * (ranked ballots contribute first preference). Per-option approval/weighted
  * tallying is a documented extension.
+ *
+ * Each outcome also reports the Gini of its transformed weights, so the UI
+ * can show the fairness impact of every rule, not just winner flips.
  */
 export function computeOutcomes(votes: readonly VoteEvent[]): RuleOutcome[] {
   const g = gini(votes.map((v) => v.weight));
@@ -32,11 +38,14 @@ export function computeOutcomes(votes: readonly VoteEvent[]): RuleOutcome[] {
 
   return rules.map(([rule, fn]) => {
     const tally: Record<string, number> = {};
+    const transformed: number[] = [];
     for (const v of votes) {
       const key = primaryChoice(v.choice);
-      tally[key] = (tally[key] ?? 0) + fn(v.weight);
+      const w = fn(v.weight);
+      tally[key] = (tally[key] ?? 0) + w;
+      transformed.push(w);
     }
-    return { rule, tally, winner: winnerOf(tally) };
+    return { rule, tally, winner: winnerOf(tally), gini: gini(transformed) };
   });
 }
 

@@ -97,6 +97,13 @@ export interface Signals {
   voterCount: number;
   /** Sum of weight cast so far. */
   totalWeight: number;
+  /**
+   * Share of wallets that share an exact cast timestamp with at least one
+   * other wallet — duplicate-timestamp Sybil proxy. [0,1]
+   */
+  dupTimestampRatio: number;
+  /** Smallest number of wallets whose combined weight is >=50% of cast weight. */
+  walletsFor50Pct: number;
 }
 
 /** Result of one voting rule applied to the votes so far. */
@@ -106,6 +113,8 @@ export interface RuleOutcome {
   tally: Record<string, number>;
   /** Winning choice key, or null if no votes / exact tie. */
   winner: string | null;
+  /** Gini of the transformed ballot weights under this rule (fairness impact). */
+  gini: number;
 }
 
 export type CounterfactualRule =
@@ -135,6 +144,12 @@ export interface Snapshot {
   severity: Severity;
   outcomes: RuleOutcome[];
   robustness: Robustness;
+  /**
+   * Tiered rule selection:
+   * extreme whale -> 1W1V; sybil/collusion evidence or dup-timestamp burst
+   * -> QV; otherwise the token rule stands.
+   */
+  recommendedRule: CounterfactualRule;
   /** True once the pre-authorised escalation policy would have fired. */
   escalated: boolean;
 }
@@ -160,6 +175,8 @@ export interface EngineConfig {
   collusionVpShareThreshold: number;
   /** Weighted-vote comparison tolerance (default 0.05). */
   weightedTolerance: number;
+  /** Dup-timestamp wallet ratio that triggers the QV tier (default 0.20). */
+  dupTsRatioThreshold: number;
 }
 
 export const DEFAULT_CONFIG: EngineConfig = {
@@ -173,4 +190,5 @@ export const DEFAULT_CONFIG: EngineConfig = {
   collusionMinClusterSize: 3,
   collusionVpShareThreshold: 0.1,
   weightedTolerance: 0.05,
+  dupTsRatioThreshold: 0.2,
 };

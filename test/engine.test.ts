@@ -74,6 +74,19 @@ describe("BonkDAO-shaped replay (BIP #76 placeholder fixture)", () => {
     expect(final.robustness).toBe("rule-dependent");
   });
 
+  it("tiered rule selection recommends 1W1V against whale dominance", () => {
+    expect(final.recommendedRule).toBe("1W1V");
+    expect(frames[0]!.recommendedRule).toBe("1W1V"); // from the attacker's vote
+  });
+
+  it("reports concentration stats: one wallet controls 50%+, per-rule Gini", () => {
+    expect(final.signals.walletsFor50Pct).toBe(1);
+    const oneWallet = final.outcomes.find((o) => o.rule === "1W1V")!;
+    const actual = final.outcomes.find((o) => o.rule === "1T1V")!;
+    expect(oneWallet.gini).toBeCloseTo(0, 6);
+    expect(actual.gini).toBeGreaterThan(0.8);
+  });
+
   it("escalates early — days before the voting window closes", () => {
     expect(final.escalated).toBe(true);
     const esc = final.alerts.find((a) => a.id === "policy:escalation")!;
@@ -109,6 +122,8 @@ describe("sybil detection", () => {
     const sybilAlerts = last.alerts.filter((a) => a.signal === "sybil");
     expect(sybilAlerts).toHaveLength(1);
     expect(sybilAlerts[0]!.severity).toBe("extreme");
+    // tier 2: sybil evidence (no whale dominance) -> QV recount
+    expect(last.recommendedRule).toBe("QV");
   });
 
   it("does not flag organic, spread-out voting", () => {

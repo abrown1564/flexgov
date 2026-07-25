@@ -18,6 +18,12 @@ export function buildReport(snapshot: Snapshot): string {
   lines.push(`- Top wallet share: ${(signals.whaleShare * 100).toFixed(3)}%`);
   lines.push(`- Top-3 share: ${(signals.top3Share * 100).toFixed(3)}%`);
   lines.push(`- Gini (weight concentration): ${signals.gini.toFixed(4)}`);
+  lines.push(
+    `- Wallets controlling 50% of cast weight: ${signals.walletsFor50Pct}`,
+  );
+  lines.push(
+    `- Duplicate-timestamp wallet ratio: ${(signals.dupTimestampRatio * 100).toFixed(1)}%`,
+  );
   if (signals.turnout != null)
     lines.push(`- Turnout: ${(signals.turnout * 100).toFixed(3)}% of members`);
   if (signals.quorumProgress != null)
@@ -38,10 +44,15 @@ export function buildReport(snapshot: Snapshot): string {
 
   lines.push("## Counterfactual outcomes");
   for (const o of outcomes) {
-    lines.push(`- ${o.rule}: winner = ${o.winner ?? "tie/none"}`);
+    lines.push(
+      `- ${o.rule}: winner = ${o.winner ?? "tie/none"} (Gini ${o.gini.toFixed(4)})`,
+    );
   }
   lines.push("");
   lines.push(`Robustness of the token-weighted outcome: **${robustness}**.`);
+  lines.push(
+    `Tiered rule selection recommends: **${snapshot.recommendedRule}**.`,
+  );
   if (snapshot.escalated) {
     lines.push("");
     lines.push(

@@ -21,7 +21,7 @@ const SYBIL_SEVERITY: Severity[] = ["none", "moderate", "strong", "extreme"];
  * event. Scores: timestamp burst, identical choice, suspiciously similar VP
  * (coefficient of variation), rounded VP values.
  *
- * Design notes (from the FlexGov research programme):
+ * Design notes:
  * - CV (std/mean) rather than absolute similarity, so it scales with VP size.
  * - Wallet-age signal deferred — needs chain data the event stream lacks.
  */

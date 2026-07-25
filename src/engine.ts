@@ -39,6 +39,7 @@ export function createEngine(
 
   const votes: VoteEvent[] = [];
   const weightByVoter = new Map<string, number>();
+  const votersByTimestamp = new Map<number, Set<string>>();
   const alerts: Alert[] = [];
   const firedAlertIds = new Set<string>();
   const seenClusterKeys = new Set<string>();
@@ -66,6 +67,25 @@ export function createEngine(
       proposal.totalSupply != null && proposal.quorumFraction != null
         ? proposal.totalSupply * proposal.quorumFraction
         : null;
+
+    // Duplicate-timestamp Sybil proxy: wallets sharing an exact timestamp.
+    let dupWallets = 0;
+    for (const voters of votersByTimestamp.values()) {
+      if (voters.size > 1) dupWallets += voters.size;
+    }
+
+    // Smallest wallet set controlling >=50% of cast weight.
+    let walletsFor50Pct = 0;
+    if (totalWeight > 0) {
+      const desc = [...perVoter].sort((a, b) => b - a);
+      let acc = 0;
+      for (const w of desc) {
+        acc += w;
+        walletsFor50Pct += 1;
+        if (acc >= totalWeight / 2) break;
+      }
+    }
+
     return {
       whaleShare: topShare(perVoter),
       top3Share: topKShare(perVoter, 3),
@@ -80,6 +100,9 @@ export function createEngine(
           : null,
       voterCount: weightByVoter.size,
       totalWeight,
+      dupTimestampRatio:
+        weightByVoter.size > 0 ? dupWallets / weightByVoter.size : 0,
+      walletsFor50Pct,
     };
   }
 
@@ -89,6 +112,12 @@ export function createEngine(
       event.voter,
       (weightByVoter.get(event.voter) ?? 0) + event.weight,
     );
+    let tsVoters = votersByTimestamp.get(event.timestamp);
+    if (!tsVoters) {
+      tsVoters = new Set();
+      votersByTimestamp.set(event.timestamp, tsVoters);
+    }
+    tsVoters.add(event.voter);
 
     const voteIndex = votes.length;
     const at = event.timestamp;
@@ -157,6 +186,21 @@ export function createEngine(
     const outcomes = computeOutcomes(votes);
     const robustness = classifyRobustness(outcomes);
 
+    // --- Tiered rule selection -----------------------------------------------
+    // Tier 1: outright whale dominance -> 1W1V.
+    // Tier 2: sybil/collusion evidence or dup-timestamp burst -> QV.
+    // Otherwise the token rule stands.
+    const clusterEvidence = alerts.some(
+      (a) => a.signal === "sybil" || a.signal === "collusion",
+    );
+    const recommendedRule: Snapshot["recommendedRule"] =
+      signals.whaleShare >= cfg.whaleExtremeThreshold
+        ? "1W1V"
+        : clusterEvidence ||
+            signals.dupTimestampRatio >= cfg.dupTsRatioThreshold
+          ? "QV"
+          : "1T1V";
+
     // --- Pre-authorised escalation policy (advisory) -------------------------
     // Fires when the vote is decisive enough to matter (quorum met) AND the
     // detected conditions are severe AND the outcome is not rule-robust.
@@ -170,8 +214,7 @@ export function createEngine(
       fire(newAlerts, "policy:escalation", {
         signal: "policy",
         severity: "extreme",
-        message:
-          "Pre-authorised policy would fire here: freeze execution, open review window, pivot to rule-robust recount",
+        message: `Pre-authorised policy would fire here: freeze execution, open review window, pivot recount to ${recommendedRule}`,
         at,
         voteIndex,
       });
@@ -187,6 +230,7 @@ export function createEngine(
       severity,
       outcomes,
       robustness,
+      recommendedRule,
       escalated,
     };
     return last;
@@ -243,12 +287,15 @@ function emptySnapshot(proposal: ProposalContext): Snapshot {
           : null,
       voterCount: 0,
       totalWeight: 0,
+      dupTimestampRatio: 0,
+      walletsFor50Pct: 0,
     },
     newAlerts: [],
     alerts: [],
     severity: "none",
     outcomes: [],
     robustness: "n/a",
+    recommendedRule: "1T1V",
     escalated: false,
   };
 }
