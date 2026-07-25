@@ -1,0 +1,22 @@
+{
+  "_note": "PLACEHOLDER reconstruction of BIP #76, shaped to the published facts: 7 voters out of 18,000+ members, attacker ~99.878% of cast weight, 1% quorum satisfied by the attacker alone, 6-day window. Voter addresses, exact weights, choices and timestamps MUST be replaced with the real on-chain reconstruction (Solscan/Realms) before the demo. Weight units are abstract.",
+  "proposal": {
+    "id": "bip-76",
+    "title": "BIP #76 — Sowellian BonkDAO (placeholder reconstruction)",
+    "start": 1000000000,
+    "end": 1000518400,
+    "memberCount": 18000,
+    "totalSupply": 100000000,
+    "quorumFraction": 0.01,
+    "choices": ["For", "Against"]
+  },
+  "events": [
+    { "voter": "attacker.placeholder", "weight": 1005000, "choice": "For", "timestamp": 1000003600 },
+    { "voter": "wallet2.placeholder", "weight": 205, "choice": "Against", "timestamp": 1000090000 },
+    { "voter": "wallet3.placeholder", "weight": 205, "choice": "Against", "timestamp": 1000176400 },
+    { "voter": "wallet4.placeholder", "weight": 205, "choice": "For", "timestamp": 1000262800 },
+    { "voter": "wallet5.placeholder", "weight": 205, "choice": "Against", "timestamp": 1000349200 },
+    { "voter": "wallet6.placeholder", "weight": 205, "choice": "Against", "timestamp": 1000435600 },
+    { "voter": "wallet7.placeholder", "weight": 205, "choice": "Against", "timestamp": 1000500000 }
+  ]
+}
