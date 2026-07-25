@@ -1,0 +1,5 @@
+title: FlexGov
+description: Adaptive governance security for DAOs — deterrence, not fortification
+theme: jekyll-theme-cayman
+exclude:
+  - landing-page
