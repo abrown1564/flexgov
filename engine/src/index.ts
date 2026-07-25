@@ -3,6 +3,12 @@ export { gini, topShare, topKShare } from "./signals.js";
 export { choiceKey, inferVoteType, primaryChoice } from "./choices.js";
 export { computeOutcomes, classifyRobustness } from "./counterfactuals.js";
 export {
+  VULNERABILITY_MATRIX,
+  detectorApplies,
+  type VulnerabilityRow,
+  type DetectorName,
+} from "./matrix.js";
+export {
   detectSybilAt,
   detectCollusionAt,
   type Cluster,

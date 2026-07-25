@@ -30,6 +30,10 @@ export function buildReport(snapshot: Snapshot): string {
     lines.push(
       `- Quorum progress: ${(signals.quorumProgress * 100).toFixed(1)}%`,
     );
+  if (signals.lateWeightShare != null)
+    lines.push(
+      `- Late-arriving weight: ${(signals.lateWeightShare * 100).toFixed(1)}% of total (late voting, not token acquisition)`,
+    );
   lines.push("");
 
   if (alerts.length > 0) {

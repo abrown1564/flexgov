@@ -1,4 +1,4 @@
-import type { EngineConfig, Severity, VoteEvent } from "../types.js";
+import type { EngineConfig, Severity, VoteEvent, VoteType } from "../types.js";
 import { choiceKey } from "../choices.js";
 
 export interface Cluster {
@@ -103,23 +103,29 @@ export function detectSybilAt(
  * Signal 3 deliberately REWARDS spread-out clusters ("rainbow attack"):
  * colluders who know about burst detection space their votes; an identical
  * ranking shared across a long window is itself suspicious.
+ *
+ * `voteType` is threaded in so choiceKey applies the right comparison
+ * semantics (approval sets are order-insensitive; ranked orderings are not).
+ * The engine only calls this for types where collusion is meaningful.
  */
 export function detectCollusionAt(
   votes: readonly VoteEvent[],
   cfg: EngineConfig,
+  voteType: VoteType,
 ): Cluster | null {
   const latest = votes[votes.length - 1];
   if (!latest) return null;
 
-  const latestKey = choiceKey(latest.choice, {
+  const keyOpts = {
+    voteTypeHint: voteType,
     weightedTolerance: cfg.weightedTolerance,
-  });
+  };
+  const latestKey = choiceKey(latest.choice, keyOpts);
   const windowStart = latest.timestamp - cfg.collusionWindowSeconds;
   const window = votes.filter(
     (v) =>
       v.timestamp >= windowStart &&
-      choiceKey(v.choice, { weightedTolerance: cfg.weightedTolerance }) ===
-        latestKey,
+      choiceKey(v.choice, keyOpts) === latestKey,
   );
   if (window.length < cfg.collusionMinClusterSize) return null;
 

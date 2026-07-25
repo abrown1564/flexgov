@@ -6,10 +6,13 @@ import type {
   Signals,
   Snapshot,
   VoteEvent,
+  VoteType,
 } from "./types.js";
 import { DEFAULT_CONFIG, maxSeverity } from "./types.js";
 import { gini, topKShare, topShare } from "./signals.js";
 import { computeOutcomes, classifyRobustness } from "./counterfactuals.js";
+import { inferVoteType } from "./choices.js";
+import { detectorApplies } from "./matrix.js";
 import {
   detectCollusionAt,
   detectSybilAt,
@@ -46,6 +49,10 @@ export function createEngine(
   let severity: Severity = "none";
   let escalated = false;
   let last: Snapshot = emptySnapshot(proposal);
+
+  // Resolve the voting type once: prefer the proposal's declared type, else
+  // infer from the first ballot's shape. This drives which detectors apply.
+  let resolvedVoteType: VoteType | null = proposal.voteType ?? null;
 
   function fire(
     newAlerts: Alert[],
@@ -86,6 +93,19 @@ export function createEngine(
       }
     }
 
+    // Late-influence: share of total cast weight that arrived in the final
+    // `lateWindowFraction` of the voting window. Needs a usable window and
+    // some weight; otherwise null.
+    let lateWeightShare: number | null = null;
+    const windowLength = proposal.end - proposal.start;
+    if (windowLength > 0 && totalWeight > 0) {
+      const lateCutoff = proposal.end - windowLength * cfg.lateWindowFraction;
+      const lateWeight = votes
+        .filter((v) => v.timestamp >= lateCutoff)
+        .reduce((a, v) => a + v.weight, 0);
+      lateWeightShare = lateWeight / totalWeight;
+    }
+
     return {
       whaleShare: topShare(perVoter),
       top3Share: topKShare(perVoter, 3),
@@ -103,6 +123,7 @@ export function createEngine(
       dupTimestampRatio:
         weightByVoter.size > 0 ? dupWallets / weightByVoter.size : 0,
       walletsFor50Pct,
+      lateWeightShare,
     };
   }
 
@@ -123,6 +144,12 @@ export function createEngine(
     const at = event.timestamp;
     const signals = computeSignals();
     const newAlerts: Alert[] = [];
+
+    // Lock in the voting type on the first ballot if it wasn't declared.
+    if (resolvedVoteType === null) {
+      resolvedVoteType = inferVoteType(event.choice);
+    }
+    const voteType = resolvedVoteType;
 
     // --- Whale dominance ---------------------------------------------------
     if (signals.whaleShare >= cfg.whaleExtremeThreshold) {
@@ -171,11 +198,34 @@ export function createEngine(
       }
     }
 
+    // --- Late influence -----------------------------------------------------
+    // A large share of weight arriving in the final slice of the window is a
+    // proxy for late influence (late voting, not late token acquisition —
+    // see Signals.lateWeightShare). Stronger when that late weight is also
+    // whale-concentrated.
+    if (
+      signals.lateWeightShare != null &&
+      signals.lateWeightShare >= cfg.lateWeightShareThreshold
+    ) {
+      const whaleLate = signals.whaleShare >= cfg.whaleModerateThreshold;
+      fire(newAlerts, "late:influence", {
+        signal: "late",
+        severity: whaleLate ? "strong" : "moderate",
+        message: `${pct(signals.lateWeightShare)} of voting weight arrived in the final ${pct(cfg.lateWindowFraction)} of the window${whaleLate ? " and is whale-concentrated" : ""}`,
+        at,
+        voteIndex,
+      });
+    }
+
     // --- Cluster detectors (deduped by cluster key) -------------------------
-    for (const cluster of [
-      detectSybilAt(votes, cfg),
-      detectCollusionAt(votes, cfg),
-    ]) {
+    // Sybil always applies; collusion only for vote types where identical
+    // ballots are meaningful (per the vulnerability matrix) — identical "For"
+    // votes under single/basic are ordinary, not collusion.
+    const clusterCandidates: Array<Cluster | null> = [detectSybilAt(votes, cfg)];
+    if (detectorApplies(voteType, "collusion")) {
+      clusterCandidates.push(detectCollusionAt(votes, cfg, voteType));
+    }
+    for (const cluster of clusterCandidates) {
       if (cluster && !seenClusterKeys.has(cluster.key)) {
         seenClusterKeys.add(cluster.key);
         fireCluster(newAlerts, cluster, at, voteIndex);
@@ -289,6 +339,7 @@ function emptySnapshot(proposal: ProposalContext): Snapshot {
       totalWeight: 0,
       dupTimestampRatio: 0,
       walletsFor50Pct: 0,
+      lateWeightShare: null,
     },
     newAlerts: [],
     alerts: [],
