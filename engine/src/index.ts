@@ -14,4 +14,5 @@ export {
   type Cluster,
 } from "./detectors/clusters.js";
 export { createEngine, replay, type Engine } from "./engine.js";
+export { analyze } from "./analyze.js";
 export { buildReport } from "./report.js";

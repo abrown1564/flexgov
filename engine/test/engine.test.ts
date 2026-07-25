@@ -7,6 +7,7 @@ import {
   createEngine,
   gini,
   replay,
+  analyze,
   buildReport,
   VULNERABILITY_MATRIX,
   detectorApplies,
@@ -268,5 +269,49 @@ describe("late-influence signal", () => {
       events,
     ).at(-1)!;
     expect(last.alerts.some((a) => a.signal === "late")).toBe(false);
+  });
+});
+
+describe("batch analyze() matches replay()'s final frame (non-cluster fields)", () => {
+  // Same synthetic capture scenario used above. analyze() is the one-shot path
+  // for large proposals; it must agree with replay() on signals, counterfactuals
+  // and robustness (cluster detection aside, which batch does not run yet).
+  const proposal: ProposalContext = {
+    id: "batch-parity",
+    start: 1_000_000_000,
+    end: 1_000_518_400,
+    memberCount: 18_000,
+    totalSupply: 100_000_000,
+    quorumFraction: 0.01,
+  };
+  const events: VoteEvent[] = [
+    { voter: "whale", weight: 1_005_000, choice: "For", timestamp: 1_000_003_600 },
+    { voter: "w2", weight: 205, choice: "Against", timestamp: 1_000_090_000 },
+    { voter: "w3", weight: 205, choice: "Against", timestamp: 1_000_176_400 },
+    { voter: "w4", weight: 205, choice: "For", timestamp: 1_000_262_800 },
+    { voter: "w5", weight: 205, choice: "Against", timestamp: 1_000_349_200 },
+  ];
+
+  const replayed = replay(proposal, events).at(-1)!;
+  const batched = analyze(proposal, events);
+
+  it("agrees on core signals", () => {
+    expect(batched.signals.whaleShare).toBeCloseTo(replayed.signals.whaleShare, 10);
+    expect(batched.signals.gini).toBeCloseTo(replayed.signals.gini, 10);
+    expect(batched.signals.walletsFor50Pct).toBe(replayed.signals.walletsFor50Pct);
+    expect(batched.signals.voterCount).toBe(replayed.signals.voterCount);
+  });
+
+  it("agrees on counterfactual winners and robustness", () => {
+    for (const rule of ["1T1V", "QV", "1W1V", "GININORM"] as const) {
+      expect(batched.outcomes.find((o) => o.rule === rule)!.winner).toBe(
+        replayed.outcomes.find((o) => o.rule === rule)!.winner,
+      );
+    }
+    expect(batched.robustness).toBe(replayed.robustness);
+  });
+
+  it("agrees on escalation", () => {
+    expect(batched.escalated).toBe(replayed.escalated);
   });
 });
