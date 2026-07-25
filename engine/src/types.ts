@@ -20,7 +20,20 @@ export type Choice =
   | Array<number | string>
   | Record<string, number>;
 
-export type VoteType = "single" | "ranked" | "approval" | "weighted";
+/**
+ * The voting type declared at the proposal level. This is the source of truth
+ * for which detectors apply (see the vulnerability matrix in matrix.ts). Ballot
+ * shape alone cannot distinguish some of these (e.g. single vs. basic, or
+ * weighted vs. quadratic share the same shape), which is why the proposal must
+ * declare it; inferVoteType() is only a fallback.
+ */
+export type VoteType =
+  | "single" // pick one option, token-weighted
+  | "basic" // For / Against / Abstain (Snapshot "basic", Governor bravo)
+  | "approval" // pick many; each selected option gets the voter's full weight
+  | "ranked" // full ordering (instant-runoff)
+  | "weighted" // split weight across options
+  | "quadratic"; // weight counted as its square root
 
 /** One governance vote landing on a proposal. */
 export interface VoteEvent {
@@ -39,6 +52,12 @@ export interface ProposalContext {
   /** Unix seconds — voting window. */
   start: number;
   end: number;
+  /**
+   * Declared voting type. Determines which detectors apply (matrix.ts). If
+   * omitted, the engine falls back to inferring it from the first ballot's
+   * shape — less reliable, so prefer setting this from platform metadata.
+   */
+  voteType?: VoteType;
   /** Known DAO membership (wallets eligible/known), for turnout signals. */
   memberCount?: number;
   /** Total token supply (same unit as VoteEvent.weight), for quorum. */
@@ -72,6 +91,7 @@ export interface Alert {
     | "quorum"
     | "sybil"
     | "collusion"
+    | "late"
     | "policy";
   severity: Severity;
   message: string;
@@ -104,6 +124,14 @@ export interface Signals {
   dupTimestampRatio: number;
   /** Smallest number of wallets whose combined weight is >=50% of cast weight. */
   walletsFor50Pct: number;
+  /**
+   * Share of total cast weight that arrived in the final `lateWindowFraction`
+   * of the voting window. High values mean voting power showed up late — a
+   * proxy for late influence. null when the window ([start,end]) is unusable.
+   * NOTE: this measures late *voting*, not late token *acquisition*; the engine
+   * only sees votes, so it cannot see tokens bought before the snapshot.
+   */
+  lateWeightShare: number | null;
 }
 
 /** Result of one voting rule applied to the votes so far. */
@@ -177,6 +205,16 @@ export interface EngineConfig {
   weightedTolerance: number;
   /** Dup-timestamp wallet ratio that triggers the QV tier (default 0.20). */
   dupTsRatioThreshold: number;
+  /**
+   * Late-influence window: the final fraction of the voting window that counts
+   * as "late" (default 0.10 = last 10% of [start,end]).
+   */
+  lateWindowFraction: number;
+  /**
+   * Late-influence alert threshold: fraction of total weight arriving in the
+   * late window that triggers an alert (default 0.30 = 30% of all weight).
+   */
+  lateWeightShareThreshold: number;
 }
 
 export const DEFAULT_CONFIG: EngineConfig = {
@@ -191,4 +229,6 @@ export const DEFAULT_CONFIG: EngineConfig = {
   collusionVpShareThreshold: 0.1,
   weightedTolerance: 0.05,
   dupTsRatioThreshold: 0.2,
+  lateWindowFraction: 0.1,
+  lateWeightShareThreshold: 0.3,
 };

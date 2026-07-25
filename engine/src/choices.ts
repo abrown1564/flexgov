@@ -1,6 +1,11 @@
 import type { Choice, VoteType } from "./types.js";
 
-/** Infer the vote type from a ballot's shape. */
+/**
+ * Infer the vote type from a ballot's shape. This is a FALLBACK only —
+ * ballot shape cannot distinguish single from basic, or weighted from
+ * quadratic, so prefer ProposalContext.voteType. Arrays are assumed ranked
+ * (the safer default: it keeps order significant); pass a hint for approval.
+ */
 export function inferVoteType(choice: Choice): VoteType {
   if (Array.isArray(choice)) return choice.length > 1 ? "ranked" : "single";
   if (typeof choice === "object" && choice !== null) return "weighted";
