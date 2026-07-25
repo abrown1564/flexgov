@@ -1,3 +1,5 @@
+import { LatestEnsProposal } from "./components/LatestEnsProposal";
+
 const signals = [
   { value: "99.878%", label: "voting weight controlled by one wallet" },
   { value: "7", label: "wallets participated in the proposal" },
@@ -61,7 +63,7 @@ export default function Home() {
     <main>
       <nav className="site-nav">
         <a className="brand-link" href="#top" aria-label="FlexGov home">
-          <img src="/flexgov-logo.png" alt="FlexGov" />
+          <img src="flexgov-logo.png" alt="FlexGov" />
         </a>
         <div className="nav-links">
           <a href="#problem">Problem</a>
@@ -183,6 +185,8 @@ export default function Home() {
           <span>Transparent counterfactuals.</span>
         </div>
       </section>
+
+      <LatestEnsProposal />
 
       <section className="problem-section" id="problem">
         <div className="section-index">01 / The problem</div>
@@ -348,7 +352,7 @@ export default function Home() {
       <section className="principles-section" id="principles">
         <div className="principles-card">
           <div className="principles-symbol">
-            <img src="/flexgov-icon.png" alt="" />
+            <img src="flexgov-icon.png" alt="" />
           </div>
           <div>
             <div className="section-index">05 / Constitutional choice</div>
@@ -424,7 +428,7 @@ export default function Home() {
       </section>
 
       <footer>
-        <img src="/flexgov-logo.png" alt="FlexGov" />
+        <img src="flexgov-logo.png" alt="FlexGov" />
         <p>Adaptive governance for the agentic economy.</p>
         <span>Working prototype · 2026</span>
       </footer>

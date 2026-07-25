@@ -8,3 +8,14 @@ node_modules/
 .next/
 dist/
 build/
+# ...but the landing-page build/ holds a real source vite plugin, not output
+!landing-page/build/
+!landing-page/build/**
+
+# Private strategy / working docs — kept local, never published
+PARTNER_PRIZE_STRATEGY.md
+BUILD_NOTES.md
+FLEXGOV_HACKATHON_PLAN.md
+future_work_ignore.md
+AGENTS.private.md
+.pnpm-store/
