@@ -373,6 +373,30 @@ FlexGov does not yet realise the whole ⿻ programme. Its present emphasis is go
 
 FlexGov can therefore be described as applying ⿻ Plurality primarily to the **constitutional and analytical layer** of digital governance: it allows multiple models of legitimacy to coexist, makes disagreement between them legible, and gives communities authority to determine how those models interact. Its longer-term opportunity is to extend that plurality from voting mechanisms into the social and deliberative processes surrounding collective decisions.
 
+### 8.2 Digital Commons and Institutional Design
+
+DAOs govern shared treasuries and shared protocols—common-pool resources in Ostrom's sense—and they face the classic commons problems of defining boundaries, monitoring behaviour, and enforcing agreed rules (Ostrom, 1990). Ostrom's design principles for enduring commons institutions map with striking directness onto FlexGov's architecture: monitoring by accountable monitors corresponds to the observability layer; **graduated sanctions correspond to the escalation ladder**, in which warnings precede review, review precedes delay, and delay precedes any binding consequence; collective-choice arrangements correspond to community constitutional choice; and accessible conflict-resolution mechanisms correspond to challenge windows and appeals. FlexGov also inherits the older constitutionalist insight behind separation of powers: concentrated, unchecked authority tends toward abuse regardless of who holds it, so proposer, voter, reviewer, and executor should be distinct roles with distinct authorisations (§3.5, §7).
+
+Digital commons nevertheless differ from Ostrom's fisheries and irrigation systems: participants are pseudonymous, exit is nearly free, and boundaries are contestable by design. FlexGov should be read as an attempt to supply the monitoring and graduated-sanction layers that Ostrom found essential, under conditions where the traditional social enforcement mechanisms—reputation, proximity, repeated interaction—are weak or absent.
+
+### 8.3 Condorcet and the Conditions for Collective Competence
+
+Condorcet's Jury Theorem (1785) states that, under its assumptions, majority decisions become more likely to be correct as the number of voters grows, provided voters are independently informed and each is more likely than not to choose well. The theorem is frequently cited as a defence of broad participation; it is less often noticed that its **assumptions are precisely what governance attacks destroy**. Sybil participation manufactures correlated votes that masquerade as independent ones. Vote buying replaces a voter's judgment with a purchaser's. Whale concentration reduces the effective number of independent voters toward one, whatever the nominal turnout.
+
+FlexGov's detection layer can therefore be understood as **defending the Jury Theorem's assumptions rather than assuming them**: correlation and coordination signals guard independence; turnout and quorum signals guard the effective number of voters; provenance signals guard the presumption that a ballot expresses its caster's judgment. Broad, independent participation is a condition to be verified and protected, not a premise to be taken on faith.
+
+### 8.4 Practice Corrects Philosophy
+
+Matthews (2015) observes that idealised systems can produce perverse consequences when put into practice, and that knowledge institutions improve through feedback between theory and observed behaviour. FlexGov operationalises this principle: every voting mechanism is treated as a **testable hypothesis about legitimacy** rather than a settled ideal. Running mechanisms in parallel, measuring their behaviour on real proposals, classifying outcome robustness, and evaluating detection signals against historical and synthetic attacks together form an empirical feedback loop in which governance theory is corrected by governance practice. The evaluation programme in §10 is this philosophical commitment expressed as a test plan.
+
+### 8.5 Deliberative Democracy
+
+Dryzek (2000) places communication, reasons, and reflection—rather than the mere aggregation of preferences—at the centre of democratic legitimacy. FlexGov reflects this in two places. ILS Mode (§4.7) proposes to recognise evidence of informed and deliberative participation without policing conclusions. And deliberative escalation treats mechanism-sensitive outcomes as an occasion for further discussion, amendment, and consultation rather than forcing an immediate winner—acknowledging that when authorised mechanisms disagree, the disagreement is itself information about unresolved questions of representation and influence that talk, not tallying, must address.
+
+### 8.6 Governance as an Alignment Problem
+
+Russell (2019) argues that powerful optimising systems must remain corrigible and faithful to human values under conditions of uncertainty; Gabriel (2020) asks which values, and whose, an aligned system should encode. FlexGov treats decentralised governance as the same problem in institutional form: a socio-technical system that must remain responsive to plural community values while resisting adversarial drift—whether the adversary is a token whale, a Sybil operator, or the governance layer's own automation. This is why the legibility principle (§3.2) refuses unexplained scores binding authority, why community constitutional choice (§3.1) answers Gabriel's "whose values?" by returning the question to each community, and why the escalation ladder keeps humans in the loop at every rung where authority increases. FlexGov's answer to the alignment question is procedural rather than substantive: it does not encode the correct values; it keeps the encoding visible, contestable, and revocable.
+
 ## 9. Governance and Trust Assumptions
 
 FlexGov cannot remove governance from governance. The system depends on decisions about:
@@ -530,17 +554,27 @@ Behnke, R. (2026). “Explained: The BonkDAO Hack (July 2026).” *Halborn*, 13 
 
 CoinDesk (2022). “Attacker Drains $182M From Beanstalk Stablecoin Protocol.” 17 April. Available at: <https://www.coindesk.com/tech/2022/04/17/attacker-drains-182m-from-beanstalk-stablecoin-protocol/> (Accessed: 24 July 2026).
 
+Condorcet, M.J.A.N. (1785). *Essay on the Application of Analysis to the Probability of Majority Decisions*. Paris: L'Imprimerie Royale.
+
 Dryzek, J.S. (2000). *Deliberative Democracy and Beyond: Liberals, Critics, Contestations*. Oxford University Press. DOI: <https://doi.org/10.1093/019925043X.001.0001>.
 
 Fritsch, R., Müller, M. and Wattenhofer, R. (2024). “Analyzing Voting Power in Decentralized Governance: Who Controls DAOs?” *Blockchain: Research and Applications*, 5(3), 100208. DOI: <https://doi.org/10.1016/j.bcra.2024.100208>.
+
+Gabriel, I. (2020). “Artificial Intelligence, Values, and Alignment.” *Minds and Machines*, 30(3), pp. 411–437. DOI: <https://doi.org/10.1007/s11023-020-09539-2>.
 
 Liu, F.T., Ting, K.M. and Zhou, Z.-H. (2008). “Isolation Forest.” *2008 Eighth IEEE International Conference on Data Mining*, pp. 413–422. DOI: <https://doi.org/10.1109/ICDM.2008.17>.
 
 Malwa, S. (2026). “BONK Faces $20 Million Treasury Drain After Attacker Spends $4 Million to Pass Malicious Proposal.” *CoinDesk*, 7 July. Available at: <https://www.coindesk.com/markets/2026/07/07/bonk-faces-usd20-million-treasury-drain-after-attacker-spends-usd4-million-to-pass-malicious-proposal> (Accessed: 24 July 2026).
 
+Matthews, P. (2015). *Social Epistemology and Online Knowledge Exchange*. DPhil thesis, University of the West of England, Bristol. Available at: <https://uwe-repository.worktribe.com/output/802272> (Accessed: 24 July 2026).
+
 Mohsin, F., Liu, A., Chen, P.-Y., Rossi, F. and Xia, L. (2022). “Learning to Design Fair and Private Voting Rules.” *Journal of Artificial Intelligence Research*, 75, pp. 1139–1176.
 
+Ostrom, E. (1990). *Governing the Commons: The Evolution of Institutions for Collective Action*. Cambridge University Press. DOI: <https://doi.org/10.1017/CBO9780511807763>.
+
 Pateman-Brown, A. (2025). *FlexGov — Learning to Govern: Measuring, Modelling, and Reimagining Fairness in DAO Voting*. MSc coursework (Machine Learning and Predictive Analytics), University of the West of England, Bristol.
+
+Russell, S.J. (2019). *Human Compatible: Artificial Intelligence and the Problem of Control*. New York: Viking.
 
 U.S. Securities and Exchange Commission (2023). “SEC Charges Avraham Eisenberg with Manipulating Mango Markets' ‘Governance Token’ to Steal $116 Million of Crypto Assets.” 20 January. Available at: <https://www.sec.gov/newsroom/press-releases/2023-13> (Accessed: 24 July 2026).
 
