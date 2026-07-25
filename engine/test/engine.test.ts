@@ -8,6 +8,8 @@ import {
   gini,
   replay,
   buildReport,
+  VULNERABILITY_MATRIX,
+  detectorApplies,
   type ProposalContext,
   type VoteEvent,
 } from "../src/index.js";
@@ -186,5 +188,85 @@ describe("collusion detection", () => {
     expect(collusion).toHaveLength(1);
     expect(collusion[0]!.severity).toBe("strong");
     expect(collusion[0]!.message).toContain("evasion");
+  });
+});
+
+describe("voting-type awareness (vulnerability matrix)", () => {
+  const burst = (): VoteEvent[] => [
+    { voter: "a", weight: 500, choice: "For", timestamp: 1000 },
+    { voter: "b", weight: 480, choice: "For", timestamp: 1150 },
+    { voter: "c", weight: 510, choice: "For", timestamp: 1250 },
+  ];
+
+  it("does NOT fire collusion for single-choice (identical votes are normal)", () => {
+    const last = replay(
+      { id: "sc", start: 0, end: 100000, voteType: "single" },
+      burst(),
+    ).at(-1)!;
+    expect(last.alerts.filter((a) => a.signal === "collusion")).toHaveLength(0);
+  });
+
+  it("does NOT fire collusion for basic (For/Against/Abstain)", () => {
+    const last = replay(
+      { id: "b", start: 0, end: 100000, voteType: "basic" },
+      burst(),
+    ).at(-1)!;
+    expect(last.alerts.filter((a) => a.signal === "collusion")).toHaveLength(0);
+  });
+
+  it("DOES fire collusion for approval (identical approval sets are suspicious)", () => {
+    const events: VoteEvent[] = [
+      { voter: "a", weight: 500, choice: ["1", "3"], timestamp: 1000 },
+      { voter: "b", weight: 480, choice: ["3", "1"], timestamp: 1150 },
+      { voter: "c", weight: 510, choice: ["1", "3"], timestamp: 1250 },
+    ];
+    const last = replay(
+      { id: "ap", start: 0, end: 100000, voteType: "approval" },
+      events,
+    ).at(-1)!;
+    expect(
+      last.alerts.filter((a) => a.signal === "collusion").length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("matrix has 2-3 rows per voting type and gates collusion correctly", () => {
+    for (const rows of Object.values(VULNERABILITY_MATRIX)) {
+      expect(rows.length).toBeGreaterThanOrEqual(2);
+      expect(rows.length).toBeLessThanOrEqual(3);
+    }
+    expect(detectorApplies("single", "collusion")).toBe(false);
+    expect(detectorApplies("basic", "collusion")).toBe(false);
+    expect(detectorApplies("approval", "collusion")).toBe(true);
+    expect(detectorApplies("ranked", "collusion")).toBe(true);
+  });
+});
+
+describe("late-influence signal", () => {
+  it("fires when a large share of weight arrives in the final window slice", () => {
+    // Window [0, 1000]; final 10% is (900, 1000]. Two big late votes = ~90% late.
+    const events: VoteEvent[] = [
+      { voter: "early", weight: 100, choice: "For", timestamp: 100 },
+      { voter: "late1", weight: 450, choice: "For", timestamp: 950 },
+      { voter: "late2", weight: 450, choice: "Against", timestamp: 980 },
+    ];
+    const last = replay(
+      { id: "late", start: 0, end: 1000, voteType: "single" },
+      events,
+    ).at(-1)!;
+    expect(last.signals.lateWeightShare).toBeGreaterThan(0.8);
+    expect(last.alerts.some((a) => a.signal === "late")).toBe(true);
+  });
+
+  it("does NOT fire when voting is spread evenly across the window", () => {
+    const events: VoteEvent[] = [
+      { voter: "a", weight: 100, choice: "For", timestamp: 100 },
+      { voter: "b", weight: 100, choice: "For", timestamp: 400 },
+      { voter: "c", weight: 100, choice: "Against", timestamp: 700 },
+    ];
+    const last = replay(
+      { id: "even", start: 0, end: 1000, voteType: "single" },
+      events,
+    ).at(-1)!;
+    expect(last.alerts.some((a) => a.signal === "late")).toBe(false);
   });
 });
