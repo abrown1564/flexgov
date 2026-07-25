@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { analyseSnapshotProposal } from "./engineAdapter";
+import type { Snapshot as EngineSnapshot } from "../../../engine/src/index.js";
 
 /**
  * This is the smallest useful shape returned by Snapshot Hub for this panel.
@@ -14,6 +16,9 @@ type SnapshotProposal = {
   votes: number;
   start: number;
   end: number;
+  // Snapshot's voting type (e.g. "single-choice", "ranked-choice"); drives the
+  // engine's vote-type-aware detectors.
+  type: string;
 };
 
 type ProposalQueryResponse = {
@@ -78,16 +83,19 @@ const LATEST_PROPOSAL_QUERY = `
       votes
       start
       end
+      type
     }
   }
 `;
 
 // Votes are requested oldest-first so the table reflects proposal chronology.
+// Paginated with a `created` cursor (not `skip`) so we can fetch every vote in
+// a proposal without hitting Snapshot's skip cap. 1000 is the per-query max.
 const PROPOSAL_VOTES_QUERY = `
-  query ProposalVotes($proposalId: String!) {
+  query ProposalVotes($proposalId: String!, $createdGte: Int!) {
     votes(
-      first: 10
-      where: { proposal: $proposalId }
+      first: 1000
+      where: { proposal: $proposalId, created_gte: $createdGte }
       orderBy: "created"
       orderDirection: asc
     ) {
@@ -100,6 +108,10 @@ const PROPOSAL_VOTES_QUERY = `
   }
 `;
 
+// How many votes to show in the table. The engine analyses ALL of them; the
+// table is just a preview of the first few.
+const VOTE_TABLE_PREVIEW = 10;
+
 export function LatestEnsProposal() {
   // Nothing is fetched automatically: the user initiates the live request.
   const [selectedDao, setSelectedDao] = useState<DaoOption>(DAO_OPTIONS[0]);
@@ -111,6 +123,8 @@ export function LatestEnsProposal() {
     "idle" | "loading" | "error"
   >("idle");
   const [votesError, setVotesError] = useState("");
+  // The engine's analysis of the currently loaded proposal + votes, if any.
+  const [analysis, setAnalysis] = useState<EngineSnapshot | null>(null);
   const proposalRequestId = useRef(0);
 
   async function fetchLatestProposal(dao: DaoOption = selectedDao) {
@@ -122,6 +136,7 @@ export function LatestEnsProposal() {
     setVotes([]);
     setVotesStatus("idle");
     setVotesError("");
+    setAnalysis(null);
 
     try {
       const response = await fetch(SNAPSHOT_HUB_ENDPOINT, {
@@ -174,29 +189,64 @@ export function LatestEnsProposal() {
     setVotesError("");
 
     try {
-      const response = await fetch(SNAPSHOT_HUB_ENDPOINT, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          query: PROPOSAL_VOTES_QUERY,
-          variables: { proposalId: proposal.id },
-        }),
-      });
+      // Page through EVERY vote in the proposal so the engine analyses the
+      // whole electorate, not a sample. Cursor on `created` (>=) with id-dedup
+      // avoids Snapshot's skip cap and handles same-timestamp ties.
+      const pageSize = 1000;
+      const all: SnapshotVote[] = [];
+      const seen = new Set<string>();
+      let createdGte = 0;
 
-      if (!response.ok) {
-        throw new Error(`Snapshot returned HTTP ${response.status}`);
+      while (true) {
+        const response = await fetch(SNAPSHOT_HUB_ENDPOINT, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            query: PROPOSAL_VOTES_QUERY,
+            variables: { proposalId: proposal.id, createdGte },
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Snapshot returned HTTP ${response.status}`);
+        }
+
+        const result = (await response.json()) as VoteQueryResponse;
+        if (result.errors?.length) {
+          throw new Error(
+            result.errors.map(({ message }) => message).join("; "),
+          );
+        }
+
+        const page = result.data?.votes ?? [];
+        if (page.length === 0) break;
+
+        let added = 0;
+        for (const vote of page) {
+          if (!seen.has(vote.id)) {
+            seen.add(vote.id);
+            all.push(vote);
+            added += 1;
+          }
+        }
+
+        // Last page reached.
+        if (page.length < pageSize) break;
+        // Safety: if a single timestamp holds >pageSize votes we can't advance;
+        // stop rather than loop forever (rare, and acceptable for the preview).
+        if (added === 0) break;
+        // Advance the cursor to the newest timestamp seen; dedup covers ties.
+        createdGte = page[page.length - 1]!.created;
       }
 
-      const result = (await response.json()) as VoteQueryResponse;
-      if (result.errors?.length) {
-        throw new Error(result.errors.map(({ message }) => message).join("; "));
-      }
-
-      setVotes(result.data?.votes ?? []);
+      // Table shows a preview; the engine analyses the full set.
+      setVotes(all);
       setVotesStatus("idle");
+      setAnalysis(analyseSnapshotProposal(proposal, all));
     } catch (caught) {
       setVotes([]);
       setVotesStatus("error");
+      setAnalysis(null);
       setVotesError(
         caught instanceof Error ? caught.message : "The request did not complete.",
       );
@@ -308,10 +358,17 @@ export function LatestEnsProposal() {
                 onClick={fetchProposalVotes}
                 disabled={votesStatus === "loading"}
               >
-                {votesStatus === "loading" ? "Loading votes…" : "Load votes"}
+                {votesStatus === "loading" ? "Loading all votes…" : "Load votes"}
                 <span aria-hidden="true">↓</span>
               </button>
-              <small>First 10 votes</small>
+              <small>
+                {votes.length > 0
+                  ? `Analysing all ${votes.length.toLocaleString()} votes · showing first ${Math.min(
+                      VOTE_TABLE_PREVIEW,
+                      votes.length,
+                    )}`
+                  : "Loads every vote; analysis runs on the full proposal"}
+              </small>
             </div>
 
             {votesStatus === "error" && (
@@ -333,7 +390,7 @@ export function LatestEnsProposal() {
                     </tr>
                   </thead>
                   <tbody>
-                    {votes.map((vote) => (
+                    {votes.slice(0, VOTE_TABLE_PREVIEW).map((vote) => (
                       <tr key={vote.id}>
                         <td>
                           <span title={vote.voter}>
@@ -349,10 +406,104 @@ export function LatestEnsProposal() {
                 </table>
               </div>
             )}
+
+            {analysis && (
+              <FlexGovAnalysis analysis={analysis} labels={proposal.choices} />
+            )}
           </article>
         )}
       </div>
     </section>
+  );
+}
+
+/**
+ * Renders the engine's findings for the loaded proposal. Advisory framing only:
+ * it reports measurements and comparisons, never a verdict of "attack".
+ * Signals that need data Snapshot does not provide (quorum, turnout) are simply
+ * omitted rather than shown as zero.
+ */
+function FlexGovAnalysis({
+  analysis,
+  labels,
+}: {
+  analysis: EngineSnapshot;
+  labels: readonly string[];
+}) {
+  const { signals, outcomes, robustness, alerts } = analysis;
+
+  // Map a counterfactual choice key back to its human label where possible.
+  const label = (key: string | null): string => {
+    if (key === null) return "tie / none";
+    const asIndex = Number(key);
+    if (Number.isInteger(asIndex) && labels[asIndex - 1]) {
+      return labels[asIndex - 1] as string;
+    }
+    return key;
+  };
+
+  return (
+    <div className="flexgov-analysis" aria-live="polite">
+      <div className="flexgov-analysis-bar">
+        <span>FlexGov analysis</span>
+        <strong>{analysis.voteIndex} votes analysed</strong>
+      </div>
+
+      <div className="flexgov-signals">
+        <div>
+          <dt>Top wallet share</dt>
+          <dd>{formatPct(signals.whaleShare)}</dd>
+        </div>
+        <div>
+          <dt>Top-3 share</dt>
+          <dd>{formatPct(signals.top3Share)}</dd>
+        </div>
+        <div>
+          <dt>Concentration (Gini)</dt>
+          <dd>{signals.gini.toFixed(3)}</dd>
+        </div>
+        <div>
+          <dt>Wallets for 50%</dt>
+          <dd>{signals.walletsFor50Pct}</dd>
+        </div>
+        {signals.lateWeightShare !== null && (
+          <div>
+            <dt>Weight arriving late</dt>
+            <dd>{formatPct(signals.lateWeightShare)}</dd>
+          </div>
+        )}
+      </div>
+
+      <div className="flexgov-counterfactuals">
+        <span>Outcome under different rules</span>
+        <ul>
+          {outcomes.map((o) => (
+            <li key={o.rule}>
+              <span className="cf-rule">{o.rule}</span>
+              <span className="cf-winner">{label(o.winner)}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="flexgov-robustness">
+          Outcome robustness: <strong>{robustness}</strong>
+        </p>
+      </div>
+
+      {alerts.length > 0 && (
+        <ul className="flexgov-alerts">
+          {alerts.map((a) => (
+            <li key={a.id} className={`alert-${a.severity}`}>
+              <span className="alert-signal">{a.signal}</span>
+              <span className="alert-message">{a.message}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="flexgov-disclaimer">
+        Advisory measurements only — not a determination of wrongdoing.
+      </p>
+    </div>
   );
 }
 
@@ -398,6 +549,12 @@ function formatVotingPower(votingPower: number): string {
   return new Intl.NumberFormat("en-GB", {
     maximumFractionDigits: 3,
   }).format(votingPower);
+}
+
+/** Render a [0,1] share as a percentage; extra precision for tiny shares. */
+function formatPct(value: number): string {
+  const digits = value >= 0.1 ? 1 : 3;
+  return `${(value * 100).toFixed(digits)}%`;
 }
 
 function formatUnixTime(timestamp: number): string {
