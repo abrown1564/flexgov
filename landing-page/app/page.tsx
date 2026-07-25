@@ -71,8 +71,7 @@ export default function Home() {
         </div>
         <a
           className="nav-cta"
-          href="http://localhost:3001/?doc=WHITEPAPER_v0.1.md"
-          target="_blank"
+          href="review/?doc=WHITEPAPER_v0.1.md"
         >
           Whitepaper <span>↗</span>
         </a>
@@ -102,8 +101,7 @@ export default function Home() {
             </a>
             <a
               className="text-link"
-              href="http://localhost:3001/?doc=WHITEPAPER_v0.1.md"
-              target="_blank"
+              href="review/?doc=WHITEPAPER_v0.1.md"
             >
               Read whitepaper v0.1 <span>↗</span>
             </a>
@@ -415,8 +413,7 @@ export default function Home() {
         <div className="hero-actions">
           <a
             className="button-light"
-            href="http://localhost:3001/?doc=WHITEPAPER_v0.1.md"
-            target="_blank"
+            href="review/?doc=WHITEPAPER_v0.1.md"
           >
             Read whitepaper v0.1 <span>↗</span>
           </a>
