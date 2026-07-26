@@ -5,13 +5,25 @@
 > **Working Draft — 25 July 2026**  
 > This document defines the current argument, design boundaries, and evaluation programme for FlexGov.
 
+> **IMPLEMENTATION NOTE — VISION DOCUMENT, NOT A CLAIM THAT EVERY FEATURE IS IMPLEMENTED**
+> This whitepaper was drafted at the beginning of ETHGlobal Lisbon 2026, building on earlier academic research and a broader programme of ideas about adaptive governance. It therefore combines a specification of the working hackathon MVP with an aspirational research and product roadmap. The submitted MVP is an **advisory governance-observability system**: it measures concentration and timing signals, compares the same observed ballots under four disclosed weighting transformations, reports outcome robustness and missing data, produces canonical SHA-256-verifiable reports, supports on-demand Snapshot exploration, and demonstrates a reproducible Compound Governor report sourced through The Graph. It does **not** currently identify unique humans, detect late token acquisition, run machine-learning or AI judgments at runtime, change a DAO's voting rule, enforce a timelock, attest reports onchain, or autonomously stop an execution. Sections describing those capabilities should be read as proposed designs and open research questions unless explicitly marked implemented.
+
+### Status at a glance
+
+| Status | Scope |
+| --- | --- |
+| **Implemented in the submitted MVP** | Deterministic concentration and timing measurements; 1T1V, square-root, 1W1V, and experimental Gini-adaptive counterfactuals; `robust` / `contested` / `rule-dependent` classification; data-availability disclosures; canonical source/configuration/report hashes; on-demand Snapshot exploration; pinned reports; Compound Governor proposal 393 sourced through The Graph with quorum, lifecycle, contract-action, and provenance evidence |
+| **Experimental** | Gini-adaptive dampening (`weight^(1−G)`); interpretation of timestamp concentration; thresholds used to produce advisory findings |
+| **Proposed design / research agenda** | Binding Ensemble and Flex policies; automatic rule replacement; configurable enforcement; ILS; Mixed Strategy Mode; machine-learning detection; identity-backed voting; verifiable compute; token-acquisition and funding-provenance monitoring |
+| **Unavailable or not connected in the MVP** | Unique-person identity; authoritative eligible-member turnout for current sources; late token-acquisition history; wallet funding relationships; runtime AI interpretation; content-addressed storage; onchain attestation; autonomous enforcement |
+
 ## What is FlexGov?
 
-FlexGov is an adaptive governance-security layer for decentralised organisations. It observes how a decision was actually made—who voted, with how much power, acquired when and from where—compares the outcome across different voting rules, and applies the community's pre-agreed response when a vote shows signs of capture.
+FlexGov is an advisory governance-observability framework for decentralised organisations. The submitted MVP shows who participated and with how much cast voting power, measures how concentrated that participating power was, compares the same observed ballots under different disclosed weighting assumptions, and produces a reproducible Governance Health Report. Where authoritative inputs are unavailable—such as eligible-member turnout, token-acquisition history, or wallet funding relationships—the report marks them unavailable rather than guessing.
 
-Its security thesis is economic. Governance attacks happen when winning a vote costs less than the treasury the vote controls: the BonkDAO attacker spent roughly $4.4 million to redirect approximately $20 million. FlexGov's purpose is to invert that ratio—not by making attacks impossible, but by making every attack path slower, more expensive, more visible, and less certain, until the expected cost of capture exceeds the expected payoff. **Deterrence, not fortification.**
+Its longer-term security thesis is economic. Governance attacks may be attractive when winning a vote costs less than the assets the vote controls: reporting on the BonkDAO incident indicates that an attacker spent roughly $4.4 million and directed approximately $20 million from the treasury. FlexGov's research objective is to help communities make capture more visible, slower, less certain, and ultimately more expensive than its expected payoff. This deterrence thesis is a design goal, not an effect demonstrated by the current MVP. **Deterrence, not fortification.**
 
-Three design moves carry this thesis:
+Three proposed design moves carry this longer-term thesis:
 
 1. **Adaptive rule selection.** When manipulation signals appear, FlexGov can pivot the effective voting rule under a pre-authorised policy—governed by one principle: *the rule that decides a flagged vote must never reward the behaviour that raised the flag.* Detected concentration pivots toward concentration-dampening rules; detected wallet-splitting pivots toward linear, splitting-neutral rules. The attack vector selects its own countermeasure.
 2. **Responses robust to ambiguity.** The system does not need to diagnose an attack correctly to respond correctly. Escalation—warnings, challenge windows, timelocks, review—fires on anomaly, not on attribution, so an attacker gains little by disguising one attack as another.
@@ -19,7 +31,7 @@ Three design moves carry this thesis:
 
 The consequence is that evasion itself becomes the deterrent. An attacker avoiding the whale signals must split across many wallets, fund them from mixed sources, and accumulate slowly—spending more, waiting longer, locking capital at market risk, and leaving a wider evidentiary trail, with escalation and review still waiting at the end. Every costume costs.
 
-This deterrence is measurable rather than rhetorical: for any configured policy, one can estimate the cheapest attack that defeats every layer and compare it with the payoff it seeks. FlexGov's success criterion is pushing that cost above the value it protects (see §12 and [Mathematical_questions.md](./Mathematical_questions.md)).
+The deterrence thesis is intended to become measurable: for a future configured policy, one could estimate the cheapest attack that defeats every layer and compare it with the payoff it seeks. No attack-cost inflation factor has yet been established for the MVP. The longer-term success criterion is pushing that cost above the value it protects (see §12 and [Mathematical_questions.md](./Mathematical_questions.md)).
 
 FlexGov does not prescribe one model of fair governance. Communities configure the mechanisms, thresholds, and responses; FlexGov makes those choices explicit, testable, and enforceable to exactly the degree the community authorises. The remainder of this document sets out the argument, architecture, and open questions in full.
 
@@ -27,11 +39,11 @@ FlexGov does not prescribe one model of fair governance. Communities configure t
 
 Decentralised governance makes collective decisions executable through software, but it also exposes communities to concentrated voting power, low-participation quorum capture, borrowed or purchased influence, delegation capture, Sybil participation, coordinated behaviour, and rapid execution of harmful proposals. Individual voting mechanisms mitigate some of these problems while introducing others.
 
-FlexGov is a governance-observability and adaptive-safeguards framework. It analyses who determined an outcome, measures manipulation-risk signals, compares the observed result with counterfactual outcomes under alternative governance assumptions, and applies a community's pre-authorised escalation policy.
+FlexGov is a governance-observability and adaptive-safeguards framework. The submitted MVP measures concentration and timing signals in observed ballots, compares the recorded result with conditional counterfactual outcomes under alternative weighting assumptions, and produces an advisory, reproducible report. Pre-authorised escalation and enforcement are proposed policy layers rather than capabilities exercised by the current deployment.
 
 > **FlexGov does not decide what fairness means for every community. It lets communities encode their own safeguards, detects when those safeguards are threatened, and shows whether an outcome survives alternative governance assumptions.**
 
-FlexGov supports advisory analysis, transparent measurements, 1T1V, quadratic-voting and 1W1V counterfactuals, outcome-robustness classification, and policy-based review triggers. A DAO may also authorise binding rule replacement, but only through a policy adopted before voting begins.
+The MVP supports advisory analysis, transparent measurements, 1T1V, square-root and 1W1V counterfactual stress tests, an experimental Gini-adaptive transformation, outcome-robustness classification, and deterministic threshold findings. A future DAO deployment may authorise review or binding rule replacement, but only through a policy adopted before voting begins and an external system with enforcement authority.
 
 ## 1. Problem
 
@@ -104,22 +116,20 @@ Governance analysis should collect no more data than it needs. Participants must
 
 ## 4. FlexGov Architecture
 
+This section combines the implemented analytical core with proposed policy and governance layers. Sections 4.1–4.4 describe the architecture that the MVP partially implements; Sections 4.5–4.8 describe future constitutional and enforcement designs unless stated otherwise.
+
 ### 4.1 Data Layer
 
-The data layer indexes proposals, choices, voting power, timestamps, snapshots, delegation relationships, quorum rules, execution state, and relevant wallet history.
+The MVP normalises proposals, choices, cast voting power, timestamps, and source provenance from supported governance sources. Snapshot supplies proposal and ballot data for on-demand exploration and pinned reports. The Graph-backed Compound report additionally supplies authoritative Governor quorum, queue/execution lifecycle, contract actions, and indexed-block provenance. Delegation history, token-acquisition history, wallet funding relationships, and broadly comparable eligible-member turnout remain future data connections.
 
 ### 4.2 Detection Layer
 
-The detection layer calculates transparent measurements such as:
+The detection layer calculates implemented transparent measurements such as largest-wallet and top-k voting shares, Gini concentration, minimum wallets controlling half of cast weight, late-cast voting power, and timestamp clustering. Depending on the connected source, it can also report authoritative quorum progress. The following remain part of the wider intended signal set rather than uniformly available MVP outputs:
 
-- largest-wallet and top-k voting shares;
-- Gini concentration;
-- turnout and quorum margin;
 - voting-power changes near snapshots or deadlines;
-- voting-time clustering;
 - wallet-age and provenance indicators;
 - delegation concentration;
-- cross-rule outcome sensitivity.
+- eligible-member turnout.
 
 Machine-learning anomaly detection remains an important research path.
 
@@ -128,9 +138,9 @@ Machine-learning anomaly detection remains an important research path.
 FlexGov evaluates each supported mechanism independently:
 
 - **1T1V:** one token, one vote;
-- **QV:** a defined quadratic transformation of voting resources;
+- **QV stress test:** the square root of each observed ballot's cast voting power;
 - **1W1V:** one eligible wallet, one vote;
-- **Gini-normed 1T1V:** token-weighted voting passed through a community-configured concentration-dampening transformation—for example, a per-wallet share cap or a concave rescaling toward a target concentration level. The transformation family and its parameters are constitutional choices, adopted in advance like any other mechanism.
+- **Experimental Gini-adaptive dampening:** each observed ballot weight `w` is transformed to `w^(1−G)`, where `G` is the Gini coefficient of the observed cast weights. At `G = 0` it matches token weighting; as `G` approaches 1 it approaches equal weight per participating wallet. The MVP uses this as an experimental counterfactual stress test, not as a recommended or universally fair voting rule.
 
 One wallet, one vote is not one person, one vote. Identity-backed 1P1V requires a separate proof-of-personhood system. The difference is not merely technical: it is a constitutional choice about whether the community treats a wallet as a proxy for a person, and communities adopting 1W1V should make that assumption explicit.
 
@@ -140,19 +150,18 @@ The counterfactual layer displays results side by side. Ensemble Mode may aggreg
 
 ### 4.4 Robustness Layer
 
-FlexGov classifies whether an observed outcome is:
+The MVP classifies the recorded winner across its four tested weighting transformations as:
 
-- unanimous across the evaluated mechanisms;
-- directionally consistent;
-- mechanism-sensitive;
-- reversed by at least one plausible alternative;
-- indeterminate because required data or assumptions are missing.
+- **robust:** every tested transformation selects the same winner;
+- **contested:** the transformations disagree, but the recorded rule's winner still wins under a majority of tested rules;
+- **rule-dependent:** the recorded rule's winner loses under most tested alternatives;
+- **not available:** there are no votes or an exact tie prevents comparison.
 
-The precise mathematical specification remains open in [Mathematical_questions.md](./Mathematical_questions.md).
+These labels describe only the disclosed comparison suite and observed ballots. They are not universal statements about legitimacy or predictions of how participants would vote under a different institutional rule. Broader robustness definitions remain open in [Mathematical_questions.md](./Mathematical_questions.md).
 
 ### 4.5 Policy Layer
 
-A DAO may configure FlexGov to produce an advisory report or to apply an authorised policy that:
+**Status: proposed policy and enforcement design.** The current MVP produces advisory reports and deterministic findings; it does not execute any of the following actions. A future DAO deployment may configure an authorised policy that:
 
 - emits a warning;
 - opens a challenge window;
@@ -166,11 +175,13 @@ Automatic rule replacement is compatible with FlexGov's adaptable and modular pu
 
 ### 4.6 Modes
 
-- **Ensemble Mode:** runs the selected mechanisms in parallel. Each mechanism produces one categorical output, and the Ensemble selects the outcome supported by the greatest number—or pre-authorised weight—of mechanisms. FlexGov separately reports the degree of agreement and any outcome sensitivity. By default, mechanisms receive equal meta-votes and plurality is sufficient; DAOs may configure weights and higher thresholds. Indeterminate results remain labelled, while a tie hands control to the configured fallback mode.
-- **Flex Mode:** applies a pre-authorised deterministic response or rule-selection policy. Its selection principle: the rule that decides a flagged vote must not reward the behaviour that raised the flag—detected concentration pivots toward concentration-dampening rules (such as Gini-normed 1T1V), while detected splitting or Sybil signals pivot toward linear, splitting-neutral rules or escalate to review.
-- **Modular Mode:** allows a community to select mechanisms, detectors, thresholds, and responses.
-- **ILS Mode:** applies an Information Level Score to recognise meaningful evidence of informed and deliberative participation.
-- **Mixed Strategy Mode:** uses verifiable randomness to select among pre-authorised voting mechanisms according to a configurable probability distribution.
+The names below describe a mixture of implemented analysis and future designs:
+
+- **Ensemble comparison — implemented analytically; binding meta-voting proposed:** the MVP runs four weighting transformations in parallel and reports agreement or mechanism sensitivity. It does not aggregate them into a binding meta-vote.
+- **Flex Mode — proposed:** would apply a pre-authorised deterministic response or rule-selection policy. Its proposed selection principle is that the rule deciding a flagged vote should not reward the behaviour that raised the flag.
+- **Modular Mode — proposed configuration layer:** would allow a community to select mechanisms, detectors, thresholds, and responses.
+- **ILS Mode — proposed research direction:** would apply an Information Level Score to recognise evidence of informed and deliberative participation.
+- **Mixed Strategy Mode — proposed research direction:** would use verifiable randomness to select among pre-authorised voting mechanisms according to a configurable probability distribution.
 
 An illustrative Flex Mode policy, with every threshold, rule, and parameter community-configured and adopted before voting begins:
 
@@ -189,6 +200,8 @@ if multiple conflicting signals, or any signal near threshold:
 The policy illustrates the selection invariant: *the selected rule must make the detected behaviour worthless.* Note that a real policy must be defined over signal combinations rather than single signals—an adversary evading one threshold typically raises others—and ambiguous or conflicting signals should escalate to review rather than trigger an automatic pivot. The design of policy tables over combined signals is an open task recorded in [Mathematical_questions.md](./Mathematical_questions.md).
 
 ### 4.7 Information Level Score (ILS) Mode
+
+**Status: proposed research direction; not implemented in the MVP.**
 
 Information Level Score (ILS) Mode is FlexGov's proposed mechanism for recognising the informational quality of participation, rather than measuring influence solely through token ownership, address count, or expressed preference. It asks a limited but important question: **what evidence exists that a participant engaged meaningfully with the decision before casting a ballot?**
 
@@ -233,6 +246,8 @@ ILS therefore changes the source of voting influence but does not solve legitima
 
 ### 4.8 Mixed Strategy Mode
 
+**Status: proposed research direction; not implemented in the MVP.**
+
 Mixed Strategy Mode is FlexGov's proposed stochastic approach to mechanism selection. Instead of committing every proposal to one predictable voting rule, the DAO authorises a set of eligible mechanisms and a method for assigning each one a probability. A verifiable random draw then determines which mechanism governs the decision.
 
 The rationale is strategic unpredictability. When an attacker knows exactly which rule will apply, they can optimise token acquisition, wallet splitting, delegation, timing, or coordination for that rule. A mixed strategy may raise the cost of manipulation by forcing participants to account for several possible mechanisms rather than one certain target.
@@ -276,15 +291,16 @@ Mixed Strategy Mode therefore requires evidence that stochastic selection improv
 
 The detection methodology begins with explainable deterministic measurements because they are reproducible and easy to audit.
 
-| Risk | Initial measurement | Interpretation |
+| Risk or question | Initial measurement | MVP status and interpretation |
 |---|---|---|
-| Whale dominance | Largest-wallet share, top-k share, Gini coefficient | Describes concentration; does not prove abuse |
-| Quorum capture | Quorum margin and unique-wallet participation | Shows whether a small coalition could determine execution |
-| Late influence | Change in voting power near snapshot or deadline | May indicate purchased, borrowed, or newly delegated power |
-| Temporal coordination | Burst and clustering measures | May indicate coordinated or Sybil-linked wallet clusters; timing alone does not prove common control or collusion |
-| Sybil exposure | Wallet provenance, funding and behavioural similarity | Indicates address coordination; cannot establish unique humans |
-| Delegation capture | Delegate share and minimum controlling coalition | Shows representative concentration |
-| Mechanism sensitivity | Outcome comparison across defined rules | Shows dependence on governance assumptions |
+| Whale dominance | Largest-wallet share, top-k share, Gini coefficient | **Implemented.** Describes concentration; does not prove abuse or causal pivotality |
+| Quorum capture | Authoritative quorum progress and participating-wallet count | **Source-dependent.** Available in the Compound Governor report; unavailable for current Snapshot reports where no authoritative target is supplied |
+| Late voting | Share of cast weight arriving late in the voting window | **Implemented.** Measures ballot timing, not when the voter acquired the underlying token or delegation |
+| Late acquisition | Change in voting power near snapshot or deadline | **Not connected.** Requires historical token or delegation data |
+| Temporal coordination | Exact-timestamp and clustering measures | **Implemented as an inspectable signal.** Timing alone does not prove common control, collusion, or Sybil activity |
+| Sybil exposure | Wallet provenance, funding and behavioural similarity | **Not connected.** Cannot establish unique humans |
+| Delegation capture | Delegate share and minimum controlling coalition | **Partially available at most; not a general MVP detector.** Describes representative concentration where authoritative data exists |
+| Mechanism sensitivity | Outcome comparison across four disclosed transformations | **Implemented.** Shows dependence on the tested assumptions and observed ballots |
 
 A full matrix must connect every supported voting method to its vulnerabilities, observable signals, data, calculations, thresholds, uncertainty, response, and implementation status. That matrix is a required design task, not a completed claim.
 
@@ -308,21 +324,21 @@ Counterfactual analysis asks whether a proposal would have passed under another 
 - whether the direction of the outcome changes;
 - which participants or assumptions drive that change.
 
-For the BonkDAO demonstration, FlexGov can show how the reported token-weighted outcome compares with QV and 1W1V. It cannot claim that 1W1V represents unique humans, nor that the counterfactual alone would have stopped execution. Prevention requires a previously installed policy with enforcement authority.
+For the BonkDAO narrative case study, FlexGov uses reported facts to explain which measurements and comparisons would have been relevant. The submitted product does not present BonkDAO as a Graph-derived canonical report and does not claim a verified alternative winner. It cannot claim that 1W1V represents unique humans, nor that a counterfactual alone would have stopped execution. Prevention requires a previously installed policy with enforcement authority.
 
 ### 6.1 Case Study: The BonkDAO Attack (July 2026)
 
 **The incident.** On 6 July 2026, an attacker spent approximately $4.4 million purchasing just over 1% of BONK's supply, satisfying BonkDAO's 1% quorum threshold. Proposal "BIP #76" passed with seven wallets voting out of more than 18,000 members; the attacker controlled 99.878% of the voting weight. The proposal transferred approximately $20 million of treasury assets to the attacker's wallet. No smart contract was exploited—every transaction was permitted by the governance system (Malwa, 2026; Behnke, 2026).
 
-**What FlexGov would have measured.** Largest-wallet share: 99.878%. Turnout: seven wallets, roughly 0.04% of members. Quorum: met by a single, recently acquired position. Voting-power acquisition: concentrated in the days before the vote.
+**What the reported case indicates FlexGov should measure.** Largest-wallet share: 99.878%. Participation: seven wallets; reports describe this as roughly 0.04% of the stated community membership. Quorum: reportedly met by a single recently acquired position. The submitted MVP can represent the concentration evidence, but it does not currently connect the authoritative BonkDAO electorate, token-acquisition history, or execution data needed to reproduce every figure as a canonical report.
 
-**What FlexGov would have signalled.** Extreme concentration, critically low participation, quorum capture, and late acquisition—four independent deterministic signals, each individually beyond any plausible threshold. No machine learning is required to flag this vote; the transparent measurements alone are unambiguous.
+**What a fully connected FlexGov deployment could have signalled.** The reported facts point to extreme concentration, very low participation, quorum capture, and late acquisition. The current MVP can calculate concentration from a complete ballot set and can report authoritative quorum where the connected source supplies it; it cannot yet independently verify BonkDAO's eligible-member turnout or acquisition history. No machine learning is required to inspect the reported concentration pattern.
 
-**What the counterfactuals would have shown.** Under 1W1V, the attacker's 99.878% weight becomes one vote among seven: the outcome would have depended on the other six wallets rather than on purchased weight. Under Gini-normed 1T1V, the attacker's effective weight collapses toward the cap. Robustness classification: **outcome reversal**—the recorded result depends entirely on one governance assumption.
+**What counterfactual analysis could test.** Under 1W1V, the attacker's 99.878% reported weight would become one wallet-unit among seven, but the alternative winner would still depend on the other six recorded ballots and the eligibility assumptions applied to them. Under the MVP's experimental Gini-adaptive transformation, extreme inequality would substantially dampen large weights. Without a complete, authoritative ballot fixture in the submitted report set, FlexGov does not claim a verified BonkDAO robustness classification or outcome reversal.
 
 **What a pre-installed policy could have done.** Under a pre-authorised escalation policy, this signal profile triggers review and a timelock before execution, giving the community days—and explicit, decomposable evidence—before the transfer.
 
-**What FlexGov cannot claim.** Analysis alone would not have stopped the transfer; prevention requires enforcement authority installed before the vote (§3.5, §11). The defensible claims are narrower and sufficient: the attack was detectable at every stage from transparent measurements; the outcome was maximally mechanism-sensitive; and the attack's cost-to-payoff ratio of roughly 0.22 is exactly the ratio a configured FlexGov policy exists to invert.
+**What FlexGov cannot claim.** Analysis alone would not have stopped the transfer; prevention requires enforcement authority installed before the vote (§3.5, §11). The defensible MVP claim is narrower: the reported concentration pattern is precisely the kind of evidence a governance-observability system should surface before execution. Whether a configured policy would have prevented the incident or increased its cost remains a counterfactual research question.
 
 ## 7. Cross-Domain Defensive Techniques
 
@@ -439,7 +455,7 @@ FlexGov should be evaluated on historical proposals and controlled synthetic att
 
 ### Product Evaluation
 
-- can a reviewer identify who determined the outcome?
+- can a reviewer identify how concentrated participating voting power was?
 - can a reviewer explain every warning?
 - can a DAO understand why mechanisms disagree?
 - can users distinguish 1W1V from 1P1V?
@@ -457,14 +473,21 @@ The FlexGov hackathon implementation is built from scratch during the hackathon 
 
 **Built during the hackathon (this submission — updated as the build progresses):**
 
-- data ingestion from live governance data sources;
-- detection signals: top-wallet and top-k share, Gini concentration, turnout, quorum margin, timing clustering;
-- counterfactual tallies: 1T1V, QV, 1W1V, Gini-normed 1T1V;
-- outcome-robustness classification and the advisory governance-risk report;
-- the BonkDAO counterfactual reconstruction (§6.1);
-- identity and verifiable-compute integrations as documented in the submission.
+- on-demand proposal and ballot ingestion from Snapshot Hub;
+- a reproducible Compound Governor Bravo proposal-393 report sourced through The Graph on Ethereum mainnet, including 29 indexed ballots, authoritative quorum, lifecycle, contract-action, and source-provenance evidence;
+- deterministic signals for top-wallet and top-k share, Gini concentration, minimum wallets controlling half of cast weight, late-cast voting power, and timestamp concentration;
+- source-dependent quorum findings, with unavailable fields disclosed rather than estimated;
+- counterfactual tallies over the same observed ballots using 1T1V, square-root weighting, 1W1V, and experimental Gini-adaptive dampening;
+- `robust`, `contested`, `rule-dependent`, and unavailable outcome classification across that comparison suite;
+- canonical machine-readable Governance Health Reports with source, configuration, and report SHA-256 hashes;
+- a public React/Next.js interface with pinned reports for six Snapshot communities plus the Compound Graph case study;
+- advisory threshold findings, methodology, limitations, data-availability disclosures, and verification metadata.
 
-**Design-only (not implemented):** binding Ensemble meta-voting, ILS Mode, Mixed Strategy Mode, automatic rule replacement, and any enforcement authority. These remain subject to the open questions in §12.
+**Experimental in the submitted MVP:** Gini-adaptive dampening; the reference model used to interpret exact-timestamp concentration; configured threshold findings. These are exposed for inspection rather than presented as proof of wrongdoing or a universally correct rule.
+
+**Narrative case study, not a canonical live integration:** BonkDAO (§6.1) motivates the product and illustrates the missing evidence. The submitted implementation does not claim a live BonkDAO data adapter, late-acquisition reconstruction, or verified alternative outcome.
+
+**Design-only or not connected:** binding Ensemble meta-voting, Flex policy enforcement, ILS Mode, Mixed Strategy Mode, automatic rule replacement, token-acquisition and wallet-funding monitoring, unique-person identity, runtime machine learning or AI interpretation, content-addressed storage, onchain attestation, verifiable compute, and any enforcement authority. These remain subject to the open questions in §12.
 
 ## 11. Limitations
 
@@ -493,13 +516,13 @@ Several of these limitations have credible partial mitigations in existing infra
 - **Proof of personhood and human-backed agent attestation** (e.g., World ID and AgentKit-style credentials) address the wallet–person gap directly. They enable identity-backed 1P1V as a Flex Mode pivot destination whose attack-cost axis is identity rather than tokens—the anti-correlated attack surface that splitting-based strategies cannot buy—and they convert Sybil manipulation from an unbounded attack into a bounded per-human cost. *Residual:* identity-renting markets reduce that bound; verification establishes that a unique human exists behind a credential, not that the human engaged with the decision or solely controls the agent.
 - **TEE-based verifiable compute** (e.g., attested inference environments such as 0G Compute) addresses the oracle and operator-trust dependency. Measurements, counterfactuals, and model inferences can be attested to have been produced by the declared code on the declared inputs, so a community need not trust FlexGov's operator not to manipulate the analysis—a governance-security layer is itself a governance trust point, and attestation closes that loop. *Residual:* trust relocates to the hardware vendor and attestation chain, and attestation proves which model ran, not that the model is well calibrated, unbiased, or correctly thresholded.
 
-These mitigations strengthen exactly the two layers the deterrence thesis depends on—identity cost and analysis integrity—which is why they are prioritised in the implementation plan.
+These proposed mitigations could strengthen two layers the deterrence thesis depends on—identity cost and analysis integrity. Neither is connected in the submitted MVP, and each remains subject to the dependencies and residual risks described above.
 
 ## 12. Open Questions for Community Collaboration
 
 FlexGov is intended as a collaborative venture, not a finished doctrine. Its design principles—community constitutional choice, legibility, and contestability—apply to the framework itself: the definitions, thresholds, and mechanisms proposed here should be examined, challenged, and improved by the communities expected to rely on them. This section records the questions the authors consider unresolved and where outside expertise—from social-choice theorists, mechanism designers, statisticians, security researchers, political philosophers, and practising DAO contributors—would materially change the design. Formal treatments of several of these questions are tracked in [Mathematical_questions.md](./Mathematical_questions.md).
 
-None of these questions undermines the observability core described in §4–§6: indexing governance data, measuring who determined an outcome, explaining the evidence, and comparing results across mechanisms remain sound and useful regardless of how they are resolved. They concern the conditions under which FlexGov's stronger, binding modes can be trusted—consistent with the principle that each step up the escalation ladder carries a heavier burden of proof.
+None of these questions undermines the observability core described in §4–§6: indexing governance data, measuring the concentration and timing of participating power, explaining the evidence, and comparing results under disclosed transformations remain useful regardless of how they are resolved. They concern the conditions under which FlexGov's stronger, binding modes could be trusted—consistent with the principle that each step up the escalation ladder carries a heavier burden of proof.
 
 ### 12.1 Mechanism Composition and Correlated Vulnerabilities
 
