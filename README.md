@@ -13,6 +13,19 @@ source, configuration, and report hashes.
 - [Canonical report schema](./schemas/governance-health-report.schema.json)
 - [Whitepaper v0.1](./WHITEPAPER_v0.1.md)
 
+## Hackathon provenance
+
+**Pre-existing research disclosure:** FlexGov was informed by governance
+research and conceptual work I completed before the event, including an
+academic paper exploring related governance problems. No pre-existing FlexGov
+software implementation, interface, design assets, analysis engine, report
+schema, source adapter, Graph integration or agent tooling was submitted. All
+submitted product code and functionality—including the TypeScript engine,
+canonical reports and hashing, Snapshot interface, Compound/The Graph
+integration, agent SKILL and CLI, tests and deployment—were created during the
+hackathon. The whitepaper was drafted during the event from that earlier
+research and combines the implemented MVP with a clearly labelled wider vision.
+
 ## The Graph integration
 
 The supported flow is:
