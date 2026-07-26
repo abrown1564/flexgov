@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { analyseSnapshotProposal } from "./engineAdapter";
 import type { Snapshot as EngineSnapshot } from "../../../engine/src/index.js";
+import precomputedOptimism from "../data/precomputed-optimism.json";
 
 /**
  * This is the smallest useful shape returned by Snapshot Hub for this panel.
@@ -125,6 +126,11 @@ export function LatestEnsProposal() {
   const [votesError, setVotesError] = useState("");
   // The engine's analysis of the currently loaded proposal + votes, if any.
   const [analysis, setAnalysis] = useState<EngineSnapshot | null>(null);
+  // Tracks whether the shown result came from a live fetch or the precomputed
+  // showcase fixture, so the UI can label it honestly.
+  const [dataSource, setDataSource] = useState<"live" | "precomputed">("live");
+  // For a precomputed proposal the true total differs from the preview count.
+  const [totalVotes, setTotalVotes] = useState<number | null>(null);
   const proposalRequestId = useRef(0);
 
   async function fetchLatestProposal(dao: DaoOption = selectedDao) {
@@ -137,6 +143,17 @@ export function LatestEnsProposal() {
     setVotesStatus("idle");
     setVotesError("");
     setAnalysis(null);
+    setDataSource("live");
+    setTotalVotes(null);
+
+    // Optimism uses the saved #9b case study rather than pretending its cached
+    // 62,245-vote analysis belongs to whichever proposal happens to be latest.
+    if (dao.space === "opcollective.eth") {
+      setProposal(precomputedOptimism.proposal as SnapshotProposal);
+      setDataSource("precomputed");
+      setStatus("idle");
+      return;
+    }
 
     try {
       const response = await fetch(SNAPSHOT_HUB_ENDPOINT, {
@@ -184,6 +201,19 @@ export function LatestEnsProposal() {
 
   async function fetchProposalVotes() {
     if (!proposal) return;
+
+    // Optimism #9b has 62,245 ballots. Its result was generated with this same
+    // engine and saved locally so the ordinary "Load votes" action can display
+    // it immediately instead of downloading every ballot and recomputing it.
+    if (proposal.id === precomputedOptimism.proposal.id) {
+      setVotesStatus("idle");
+      setVotesError("");
+      setDataSource("precomputed");
+      setVotes(precomputedOptimism.previewVotes as SnapshotVote[]);
+      setTotalVotes(precomputedOptimism.totalVotes);
+      setAnalysis(precomputedOptimism.analysis as unknown as EngineSnapshot);
+      return;
+    }
 
     setVotesStatus("loading");
     setVotesError("");
@@ -241,6 +271,7 @@ export function LatestEnsProposal() {
 
       // Table shows a preview; the engine analyses the full set.
       setVotes(all);
+      setTotalVotes(all.length);
       setVotesStatus("idle");
       setAnalysis(analyseSnapshotProposal(proposal, all));
     } catch (caught) {
@@ -275,13 +306,17 @@ export function LatestEnsProposal() {
           Live data / {selectedDao.name} governance
         </div>
         <h2>
-          Explore the latest
+          Explore the {selectedDao.name === "Optimism" ? "" : "latest"}
           <br />
-          <em>{selectedDao.name} proposal.</em>
+          <em>
+            {selectedDao.name}
+            {selectedDao.name === "Optimism" ? " case study." : " proposal."}
+          </em>
         </h2>
         <p>
-          Inspect its choices, participation, status, and voting window using
-          current governance data.
+          {selectedDao.name === "Optimism"
+            ? "Inspect Special Voting Cycle #9b and its saved 62,245-vote analysis."
+            : "Inspect its choices, participation, status, and voting window using current governance data."}
         </p>
         <button
           className="live-data-button"
@@ -292,7 +327,9 @@ export function LatestEnsProposal() {
         >
           {status === "loading"
             ? "Fetching…"
-            : `Fetch latest ${selectedDao.name} proposal`}
+            : selectedDao.name === "Optimism"
+              ? "Load Optimism case study"
+              : `Fetch latest ${selectedDao.name} proposal`}
           <span aria-hidden="true">→</span>
         </button>
       </div>
@@ -300,7 +337,11 @@ export function LatestEnsProposal() {
       <div className="proposal-panel" aria-live="polite">
         <div className="proposal-panel-bar">
           <span>Source</span>
-          <strong>Snapshot Hub</strong>
+          <strong>
+            {dataSource === "precomputed"
+              ? "Snapshot Hub · precomputed"
+              : "Snapshot Hub · live"}
+          </strong>
         </div>
 
         {!proposal && status !== "error" && (
@@ -362,12 +403,16 @@ export function LatestEnsProposal() {
                 <span aria-hidden="true">↓</span>
               </button>
               <small>
-                {votes.length > 0
-                  ? `Analysing all ${votes.length.toLocaleString()} votes · showing first ${Math.min(
-                      VOTE_TABLE_PREVIEW,
-                      votes.length,
-                    )}`
-                  : "Loads every vote; analysis runs on the full proposal"}
+                {(() => {
+                  const total = totalVotes ?? votes.length;
+                  if (total === 0) {
+                    return "Loads every vote; analysis runs on the full proposal";
+                  }
+                  const shown = Math.min(VOTE_TABLE_PREVIEW, votes.length);
+                  const prefix =
+                    dataSource === "precomputed" ? "Analysed all" : "Analysing all";
+                  return `${prefix} ${total.toLocaleString()} votes · showing first ${shown}`;
+                })()}
               </small>
             </div>
 
@@ -472,6 +517,82 @@ function FlexGovAnalysis({
             <dd>{formatPct(signals.lateWeightShare)}</dd>
           </div>
         )}
+        <div className="timing-signal">
+          <dt>Votes sharing a second</dt>
+          <dd>{formatPct(signals.dupTimestampRatio)}</dd>
+          {/* Native details/summary keeps the methodology available by click
+              and keyboard without letting a long caveat dominate the report. */}
+          <details className="timing-method-note">
+            <summary>How should this be interpreted?</summary>
+            <div>
+              {signals.expectedDupTimestampRatio != null &&
+                signals.dupTimestampLift != null && (
+                  <p>
+                    The 24-hour global-flat reference would predict{" "}
+                    {formatPct(signals.expectedDupTimestampRatio)}. The observed
+                    rate is {signals.dupTimestampLift.toFixed(2)}× that baseline.
+                  </p>
+                )}
+              {signals.dupTimestampSensitivity?.length > 0 && (
+                // Show assumptions side by side because the maximally flat
+                // reference can understate natural collisions during peak hours.
+                <table className="timing-sensitivity-table">
+                  <thead>
+                    <tr>
+                      <th>Reference assumption</th>
+                      <th>Expected shared-second rate</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {signals.dupTimestampSensitivity.map((scenario) => (
+                      <tr key={scenario.activeHoursPerDay}>
+                        <td>
+                          {scenario.activeHoursPerDay === 24
+                            ? "Global-flat reference (24h)"
+                            : `${scenario.activeHoursPerDay} active hours/day`}
+                        </td>
+                        <td>{formatPct(scenario.expectedRatio)}</td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td>Observed</td>
+                      <td>{formatPct(signals.dupTimestampRatio)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
+              {signals.averageVotesPerDay != null && (
+                <p>
+                  Average activity:{" "}
+                  {formatNumber(signals.averageVotesPerDay)} votes/day,{" "}
+                  {formatNumber(signals.averageVotesPerHour ?? 0)} votes/hour,
+                  and {formatNumber(signals.averageVotesPerMinute ?? 0)}{" "}
+                  votes/minute.
+                </p>
+              )}
+              <p>
+                Timing correlation is worth inspecting, but does not establish
+                common control or Sybil activity by itself.
+              </p>
+              <p>
+                Global accessibility does not establish the electorate&apos;s
+                geographic distribution or voting schedule. A later
+                activity-adjusted baseline should preserve this proposal&apos;s
+                observed hourly pattern without requiring location data.
+              </p>
+              <strong>To resist gaming, the eventual detector should combine:</strong>
+              <ul>
+                <li>Multiple time windows: 1, 5, 30 and 300 seconds</li>
+                <li>Exact and near-similar approval/ranked ballots</li>
+                <li>Voting-power similarity</li>
+                <li>Unusually low ballot diversity inside a time cluster</li>
+                <li>
+                  Later: wallet age, funding links and historical behaviour
+                </li>
+              </ul>
+            </div>
+          </details>
+        </div>
       </div>
 
       <div className="flexgov-counterfactuals">
@@ -555,6 +676,12 @@ function formatVotingPower(votingPower: number): string {
 function formatPct(value: number): string {
   const digits = value >= 0.1 ? 1 : 3;
   return `${(value * 100).toFixed(digits)}%`;
+}
+
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat("en-GB", {
+    maximumFractionDigits: 1,
+  }).format(value);
 }
 
 function formatUnixTime(timestamp: number): string {

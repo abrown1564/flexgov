@@ -9,7 +9,13 @@ import type {
   VoteType,
 } from "./types.js";
 import { DEFAULT_CONFIG, maxSeverity } from "./types.js";
-import { gini, topKShare, topShare } from "./signals.js";
+import {
+  duplicateTimestampSensitivity,
+  expectedDuplicateTimestampRatio,
+  gini,
+  topKShare,
+  topShare,
+} from "./signals.js";
 import { computeOutcomes, classifyRobustness } from "./counterfactuals.js";
 import { inferVoteType } from "./choices.js";
 import { detectorApplies } from "./matrix.js";
@@ -106,6 +112,21 @@ export function createEngine(
       lateWeightShare = lateWeight / totalWeight;
     }
 
+    // Recompute the timing comparison as the live/replay stream grows. These
+    // baselines explain whether a collision rate is surprising under several
+    // activity-window assumptions; they do not turn timing into identity proof.
+    const votingWindowSeconds =
+      proposal.end > proposal.start ? proposal.end - proposal.start : null;
+    const expectedDupTimestampRatio =
+      votingWindowSeconds != null
+        ? expectedDuplicateTimestampRatio(
+            weightByVoter.size,
+            votingWindowSeconds,
+          )
+        : null;
+    const dupTimestampRatio =
+      weightByVoter.size > 0 ? dupWallets / weightByVoter.size : 0;
+
     return {
       whaleShare: topShare(perVoter),
       top3Share: topKShare(perVoter, 3),
@@ -120,8 +141,36 @@ export function createEngine(
           : null,
       voterCount: weightByVoter.size,
       totalWeight,
-      dupTimestampRatio:
-        weightByVoter.size > 0 ? dupWallets / weightByVoter.size : 0,
+      dupTimestampRatio,
+      votingWindowSeconds,
+      averageVotesPerDay:
+        votingWindowSeconds != null
+          ? (weightByVoter.size / votingWindowSeconds) * 86_400
+          : null,
+      averageVotesPerHour:
+        votingWindowSeconds != null
+          ? (weightByVoter.size / votingWindowSeconds) * 3_600
+          : null,
+      averageVotesPerMinute:
+        votingWindowSeconds != null
+          ? (weightByVoter.size / votingWindowSeconds) * 60
+          : null,
+      expectedDupTimestampRatio,
+      dupTimestampExcess:
+        expectedDupTimestampRatio != null
+          ? dupTimestampRatio - expectedDupTimestampRatio
+          : null,
+      dupTimestampLift:
+        expectedDupTimestampRatio != null && expectedDupTimestampRatio > 0
+          ? dupTimestampRatio / expectedDupTimestampRatio
+          : null,
+      dupTimestampSensitivity:
+        votingWindowSeconds != null
+          ? duplicateTimestampSensitivity(
+              weightByVoter.size,
+              votingWindowSeconds,
+            )
+          : [],
       walletsFor50Pct,
       lateWeightShare,
     };
@@ -238,7 +287,10 @@ export function createEngine(
 
     // --- Tiered rule selection -----------------------------------------------
     // Tier 1: outright whale dominance -> 1W1V.
-    // Tier 2: sybil/collusion evidence or dup-timestamp burst -> QV.
+    // Tier 2: corroborated sybil/collusion cluster evidence -> QV.
+    // Exact-second collisions remain visible as a timing signal, but do not
+    // select a rule by themselves: large elections and activity peaks create
+    // natural collisions, and a single brittle threshold is easy to game.
     // Otherwise the token rule stands.
     const clusterEvidence = alerts.some(
       (a) => a.signal === "sybil" || a.signal === "collusion",
@@ -246,8 +298,7 @@ export function createEngine(
     const recommendedRule: Snapshot["recommendedRule"] =
       signals.whaleShare >= cfg.whaleExtremeThreshold
         ? "1W1V"
-        : clusterEvidence ||
-            signals.dupTimestampRatio >= cfg.dupTsRatioThreshold
+        : clusterEvidence
           ? "QV"
           : "1T1V";
 
@@ -338,6 +389,15 @@ function emptySnapshot(proposal: ProposalContext): Snapshot {
       voterCount: 0,
       totalWeight: 0,
       dupTimestampRatio: 0,
+      votingWindowSeconds:
+        proposal.end > proposal.start ? proposal.end - proposal.start : null,
+      averageVotesPerDay: 0,
+      averageVotesPerHour: 0,
+      averageVotesPerMinute: 0,
+      expectedDupTimestampRatio: null,
+      dupTimestampExcess: null,
+      dupTimestampLift: null,
+      dupTimestampSensitivity: [],
       walletsFor50Pct: 0,
       lateWeightShare: null,
     },

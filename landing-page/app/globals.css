@@ -1673,6 +1673,79 @@ footer span {
   border-bottom: 0;
 }
 
+.timing-method-note {
+  position: relative;
+  margin-top: 8px;
+}
+
+.timing-method-note summary {
+  width: fit-content;
+  color: var(--green-3);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  list-style: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.timing-method-note summary::-webkit-details-marker {
+  display: none;
+}
+
+.timing-method-note > div {
+  max-width: 560px;
+  margin-top: 10px;
+  border-left: 3px solid var(--orange);
+  background: var(--paper);
+  padding: 14px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.timing-method-note p {
+  margin: 0 0 10px;
+}
+
+.timing-sensitivity-table {
+  width: 100%;
+  margin: 4px 0 12px;
+  border-collapse: collapse;
+}
+
+.timing-sensitivity-table th,
+.timing-sensitivity-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 7px 8px;
+  text-align: left;
+}
+
+.timing-sensitivity-table th {
+  color: var(--green-2);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.timing-sensitivity-table th:last-child,
+.timing-sensitivity-table td:last-child {
+  text-align: right;
+}
+
+.timing-sensitivity-table tbody tr:last-child {
+  font-weight: 800;
+}
+
+.timing-method-note strong {
+  color: var(--green-2);
+}
+
+.timing-method-note ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
 @media (max-width: 800px) {
   .live-data-section {
     grid-template-columns: 1fr;

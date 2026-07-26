@@ -119,9 +119,35 @@ export interface Signals {
   totalWeight: number;
   /**
    * Share of wallets that share an exact cast timestamp with at least one
-   * other wallet — duplicate-timestamp Sybil proxy. [0,1]
+   * other wallet. This is a temporal-coordination signal, not a Sybil verdict;
+   * large or time-concentrated elections can produce natural collisions. [0,1]
    */
   dupTimestampRatio: number;
+  /** Proposal voting-window duration in seconds, when start/end are usable. */
+  votingWindowSeconds: number | null;
+  /** Average votes per day across the declared proposal window. */
+  averageVotesPerDay: number | null;
+  /** Average votes per hour across the declared proposal window. */
+  averageVotesPerHour: number | null;
+  /** Average votes per minute across the declared proposal window. */
+  averageVotesPerMinute: number | null;
+  /**
+   * Expected duplicate-timestamp ratio under a uniform independent-arrival
+   * baseline. This is a comparator, not a Sybil threshold.
+   */
+  expectedDupTimestampRatio: number | null;
+  /** Observed duplicate-timestamp ratio minus the uniform baseline. */
+  dupTimestampExcess: number | null;
+  /** Observed / expected duplicate-timestamp ratio. */
+  dupTimestampLift: number | null;
+  /**
+   * Expected collision rates under simple daily activity-window scenarios.
+   * These are sensitivity references, not claims about voter locations.
+   */
+  dupTimestampSensitivity: Array<{
+    activeHoursPerDay: number;
+    expectedRatio: number;
+  }>;
   /** Smallest number of wallets whose combined weight is >=50% of cast weight. */
   walletsFor50Pct: number;
   /**
@@ -203,7 +229,11 @@ export interface EngineConfig {
   collusionVpShareThreshold: number;
   /** Weighted-vote comparison tolerance (default 0.05). */
   weightedTolerance: number;
-  /** Dup-timestamp wallet ratio that triggers the QV tier (default 0.20). */
+  /**
+   * Legacy duplicate-timestamp comparison threshold (default 0.20), retained
+   * for configuration compatibility and reporting. It no longer selects QV by
+   * itself; a rule recommendation requires corroborated cluster evidence.
+   */
   dupTsRatioThreshold: number;
   /**
    * Late-influence window: the final fraction of the voting window that counts

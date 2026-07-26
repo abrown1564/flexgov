@@ -8,7 +8,13 @@ import type {
   VoteEvent,
 } from "./types.js";
 import { DEFAULT_CONFIG, maxSeverity } from "./types.js";
-import { gini, topKShare, topShare } from "./signals.js";
+import {
+  duplicateTimestampSensitivity,
+  expectedDuplicateTimestampRatio,
+  gini,
+  topKShare,
+  topShare,
+} from "./signals.js";
 import { computeOutcomes, classifyRobustness } from "./counterfactuals.js";
 
 /**
@@ -82,6 +88,21 @@ export function analyze(
       ? proposal.totalSupply * proposal.quorumFraction
       : null;
 
+  // Put the observed collision rate beside explicit comparison assumptions.
+  // The flat and compressed-window baselines are sensitivity checks—not an
+  // attempt to infer voter geography from public wallet activity.
+  const votingWindowSeconds =
+    proposal.end > proposal.start ? proposal.end - proposal.start : null;
+  const expectedDupTimestampRatio =
+    votingWindowSeconds != null
+      ? expectedDuplicateTimestampRatio(
+          weightByVoter.size,
+          votingWindowSeconds,
+        )
+      : null;
+  const dupTimestampRatio =
+    weightByVoter.size > 0 ? dupWallets / weightByVoter.size : 0;
+
   const signals: Signals = {
     whaleShare: topShare(perVoter),
     top3Share: topKShare(perVoter, 3),
@@ -94,8 +115,36 @@ export function analyze(
       quorumTarget != null && quorumTarget > 0 ? totalWeight / quorumTarget : null,
     voterCount: weightByVoter.size,
     totalWeight,
-    dupTimestampRatio:
-      weightByVoter.size > 0 ? dupWallets / weightByVoter.size : 0,
+    dupTimestampRatio,
+    votingWindowSeconds,
+    averageVotesPerDay:
+      votingWindowSeconds != null
+        ? (weightByVoter.size / votingWindowSeconds) * 86_400
+        : null,
+    averageVotesPerHour:
+      votingWindowSeconds != null
+        ? (weightByVoter.size / votingWindowSeconds) * 3_600
+        : null,
+    averageVotesPerMinute:
+      votingWindowSeconds != null
+        ? (weightByVoter.size / votingWindowSeconds) * 60
+        : null,
+    expectedDupTimestampRatio,
+    dupTimestampExcess:
+      expectedDupTimestampRatio != null
+        ? dupTimestampRatio - expectedDupTimestampRatio
+        : null,
+    dupTimestampLift:
+      expectedDupTimestampRatio != null && expectedDupTimestampRatio > 0
+        ? dupTimestampRatio / expectedDupTimestampRatio
+        : null,
+    dupTimestampSensitivity:
+      votingWindowSeconds != null
+        ? duplicateTimestampSensitivity(
+            weightByVoter.size,
+            votingWindowSeconds,
+          )
+        : [],
     walletsFor50Pct,
     lateWeightShare,
   };
@@ -175,13 +224,12 @@ export function analyze(
     });
   }
 
-  // tiered rule selection (no cluster evidence available in batch mode)
+  // Batch mode has no corroborated cluster evidence yet. Exact-second
+  // collisions remain visible but do not select QV by themselves.
   const recommendedRule: Snapshot["recommendedRule"] =
     signals.whaleShare >= cfg.whaleExtremeThreshold
       ? "1W1V"
-      : signals.dupTimestampRatio >= cfg.dupTsRatioThreshold
-        ? "QV"
-        : "1T1V";
+      : "1T1V";
 
   // Derive severity from the fired alerts (avoids TS narrowing on the mutated
   // `severity` variable, and is a single source of truth).

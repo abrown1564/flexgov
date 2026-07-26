@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import {
   choiceKey,
   createEngine,
+  duplicateTimestampSensitivity,
+  expectedDuplicateTimestampRatio,
   gini,
   replay,
   analyze,
@@ -22,6 +24,24 @@ describe("signals", () => {
     expect(gini([100, 100, 100, 100])).toBeCloseTo(0, 6);
     expect(gini([1_000_000, 1, 1, 1, 1, 1, 1])).toBeGreaterThan(0.8);
     expect(gini([])).toBe(0);
+  });
+
+  it("computes the neutral exact-second collision baseline", () => {
+    const expected = expectedDuplicateTimestampRatio(62_245, 6 * 86_400);
+    expect(expected).not.toBeNull();
+    expect(expected!).toBeCloseTo(0.1132, 3);
+  });
+
+  it("shows how the baseline changes under narrower daily activity windows", () => {
+    const scenarios = duplicateTimestampSensitivity(
+      62_245,
+      6 * 86_400,
+    );
+    expect(scenarios.map((s) => s.activeHoursPerDay)).toEqual([24, 16, 12, 8]);
+    expect(scenarios[0]!.expectedRatio).toBeCloseTo(0.1131, 3);
+    expect(scenarios[1]!.expectedRatio).toBeCloseTo(0.1647, 3);
+    expect(scenarios[2]!.expectedRatio).toBeCloseTo(0.2134, 3);
+    expect(scenarios[3]!.expectedRatio).toBeCloseTo(0.3023, 3);
   });
 });
 
@@ -173,6 +193,19 @@ describe("sybil detection", () => {
     ];
     const last = events.map((e) => engine.ingest(e)).at(-1)!;
     expect(last.alerts.filter((a) => a.signal === "sybil")).toHaveLength(0);
+  });
+
+  it("surfaces timestamp collisions without selecting QV on that signal alone", () => {
+    const events: VoteEvent[] = [
+      { voter: "a", weight: 10, choice: "For", timestamp: 1000 },
+      { voter: "b", weight: 10, choice: "Against", timestamp: 1000 },
+      { voter: "c", weight: 10, choice: "For", timestamp: 5000 },
+      { voter: "d", weight: 10, choice: "Against", timestamp: 9000 },
+    ];
+    const last = replay(proposal, events).at(-1)!;
+    expect(last.signals.dupTimestampRatio).toBe(0.5);
+    expect(last.signals.expectedDupTimestampRatio).not.toBeNull();
+    expect(last.recommendedRule).toBe("1T1V");
   });
 });
 
