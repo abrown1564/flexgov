@@ -870,7 +870,27 @@ function FlexGovAnalysis({
         <div className="signal-card">
           <dt>Concentration (Gini)</dt>
           <dd>{signals.gini.toFixed(3)}</dd>
-          <small>0 is equal; values approaching 1 are highly concentrated</small>
+          <small>
+            Inequality across each voter&apos;s accumulated cast voting power
+          </small>
+          <details className="calculation-note">
+            <summary>How is this calculated?</summary>
+            <div>
+              <p>
+                FlexGov totals the voting power cast by each voter, sorts those
+                totals from lowest to highest, then calculates:
+              </p>
+              <code>G = 2Σ(i × xᵢ) / (n × Σxᵢ) − (n + 1) / n</code>
+              <p>
+                Here, <code>xᵢ</code> is the voter&apos;s accumulated cast
+                voting power at sorted position <code>i</code>, and{" "}
+                <code>n</code> is the number of voters. A value of 0 means equal
+                cast power; values approaching 1 mean that cast power is
+                concentrated among fewer voters. It does not identify intent,
+                personhood, or eligible-member turnout.
+              </p>
+            </div>
+          </details>
         </div>
         <div className="signal-card">
           <dt>Wallets for 50%</dt>
@@ -1002,6 +1022,30 @@ function FlexGovAnalysis({
           </tbody>
         </table>
       </div>
+      <details className="calculation-note counterfactual-method-note">
+        <summary>How is experimental GININORM calculated?</summary>
+        <div>
+          <p>
+            FlexGov first calculates <code>G</code>, the Gini coefficient of
+            the ballot weights used in this counterfactual. Each non-negative
+            ballot weight <code>w</code> is then transformed as:
+          </p>
+          <code>w′ = w^(1 − G)</code>
+          <p>
+            When <code>G = 0</code>, weights are unchanged. As{" "}
+            <code>G</code> approaches 1, positive weights move closer to one,
+            progressively dampening concentration. FlexGov tallies the same
+            recorded choices with those transformed weights. The table&apos;s
+            “Weight Gini” is then recalculated over the transformed weights.
+          </p>
+          <p>
+            GININORM is an experimental comparison, not a recommended fair
+            outcome. It differs from the observable Gini above, which aggregates
+            voting power per voter before measuring concentration. The same
+            transform is used for first-selection and full-approval comparisons.
+          </p>
+        </div>
+      </details>
 
       {fullApproval?.status === "computed" &&
         fullApproval.outcomes &&

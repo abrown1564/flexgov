@@ -11,7 +11,7 @@
     "name": "rolldown-runtime"
   },
   "app/components/LatestEnsProposal.tsx": {
-    "file": "assets/LatestEnsProposal-Cp7QwqAw.js",
+    "file": "assets/LatestEnsProposal-CzIo6jD_.js",
     "name": "LatestEnsProposal",
     "src": "app/components/LatestEnsProposal.tsx",
     "isDynamicEntry": true,
@@ -21,7 +21,7 @@
     ]
   },
   "node_modules/vinext/dist/shims/layout-segment-context.js": {
-    "file": "assets/layout-segment-context-BODPHN8H.js",
+    "file": "assets/layout-segment-context-BdOyto7s.js",
     "name": "layout-segment-context",
     "src": "node_modules/vinext/dist/shims/layout-segment-context.js",
     "isDynamicEntry": true,
@@ -32,7 +32,7 @@
     ]
   },
   "virtual:vinext-app-browser-entry": {
-    "file": "assets/index-FyYq7y12.js",
+    "file": "assets/index-CwpfVK51.js",
     "name": "index",
     "src": "virtual:vinext-app-browser-entry",
     "isEntry": true,
