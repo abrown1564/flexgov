@@ -11,9 +11,9 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "generate:compound": "npm run build && node --env-file=.env ../scripts/generate-compound-graph-report.mjs ../landing-page/app/data/compound-393-health-report.json",
+    "generate:compound": "npm run build && node --env-file=.env ../scripts/generate-compound-graph-report.mjs --proposal 393 --output ../landing-page/app/data/compound-393-health-report.json",
     "test": "vitest run",
-    "test:compound": "npm run build && node ../scripts/test-compound-report.mjs",
+    "test:compound": "npm run build && node --test ../scripts/compound-graph-tool.test.mjs && node ../scripts/test-compound-report.mjs",
     "test:watch": "vitest"
   },
   "devDependencies": {
