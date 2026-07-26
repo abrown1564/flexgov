@@ -452,12 +452,13 @@ em {
   inset: auto clamp(24px, 7vw, 110px) 35px;
   z-index: 2;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
-  color: #8fb2a4;
+  color: #c6d9d1;
   display: flex;
-  gap: 42px;
-  padding-top: 17px;
-  font-size: 9px;
-  letter-spacing: 0.08em;
+  gap: 48px;
+  padding-top: 20px;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
@@ -1486,7 +1487,8 @@ footer span {
   border-bottom: 1px solid var(--line);
   padding: 0 24px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
@@ -1539,7 +1541,7 @@ footer span {
 
 .proposal-space,
 .proposal-state {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1550,6 +1552,7 @@ footer span {
 }
 
 .proposal-state {
+  border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--paper-deep);
   color: var(--muted);
@@ -1557,6 +1560,7 @@ footer span {
 }
 
 .proposal-state.state-active {
+  border-color: rgba(36, 85, 65, 0.35);
   background: rgba(200, 239, 100, 0.35);
   color: var(--green-2);
 }
@@ -1584,14 +1588,15 @@ footer span {
 .proposal-result dt,
 .proposal-choices summary > span {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 13px;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .proposal-result dd {
   margin: 7px 0 0;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 700;
 }
 
@@ -1612,7 +1617,7 @@ footer span {
   border: 1px solid var(--line);
   border-radius: 3px;
   padding: 8px 10px;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .support-disclosure {
@@ -1650,7 +1655,7 @@ footer span {
 
 .support-disclosure summary > span {
   color: var(--green-2);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -1659,7 +1664,7 @@ footer span {
 .support-disclosure summary > strong {
   margin-left: auto;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -1683,7 +1688,7 @@ footer span {
   color: white;
   cursor: pointer;
   font: inherit;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
   padding: 12px 14px;
 }
@@ -1695,7 +1700,7 @@ footer span {
 
 .proposal-votes-action small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -1745,7 +1750,7 @@ footer span {
 
 .analysis-eyebrow {
   color: var(--orange);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1771,22 +1776,23 @@ footer span {
 .analysis-report-header .analysis-result-summary {
   max-width: 620px;
   color: var(--green-2);
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.55;
 }
 
 .robustness-badge {
   min-width: 180px;
-  border: 1px solid var(--line);
+  border: 2px solid rgba(36, 85, 65, 0.32);
   border-radius: 6px;
-  background: white;
-  padding: 14px 16px;
+  background: rgba(200, 239, 100, 0.16);
+  padding: 16px 18px;
 }
 
 .robustness-badge span {
   display: block;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
+  font-weight: 750;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1795,12 +1801,14 @@ footer span {
   display: block;
   margin-top: 7px;
   color: var(--green-2);
-  font-size: 15px;
+  font-size: 19px;
+  font-weight: 800;
   text-transform: capitalize;
 }
 
 .robustness-rule-dependent {
-  border-color: rgba(238, 117, 64, 0.5);
+  border-color: rgba(163, 72, 41, 0.45);
+  background: rgba(238, 117, 64, 0.08);
 }
 
 .robustness-rule-dependent strong {
@@ -1821,7 +1829,7 @@ footer span {
 .ballot-mode-row > span:first-child {
   margin-right: 4px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1831,7 +1839,7 @@ footer span {
 .mode-future {
   border-radius: 999px;
   padding: 6px 10px;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .ballot-mode-row > strong {
@@ -1848,7 +1856,7 @@ footer span {
   flex-basis: 100%;
   margin: 3px 0 0;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 16px;
   line-height: 1.5;
 }
 
@@ -1862,7 +1870,7 @@ footer span {
 .report-section-heading > span {
   padding-top: 2px;
   color: var(--orange);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.06em;
 }
@@ -1870,7 +1878,7 @@ footer span {
 .report-section-heading h5 {
   margin: 0;
   color: var(--green-2);
-  font-size: 12px;
+  font-size: 15px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1878,7 +1886,7 @@ footer span {
 .report-section-heading p {
   margin: 5px 0 0;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 16px;
   line-height: 1.45;
 }
 
@@ -1895,6 +1903,7 @@ footer span {
 .signal-card {
   min-width: 0;
   border: 1px solid var(--line);
+  border-top: 3px solid var(--green-3);
   border-radius: 6px;
   background: white;
   padding: 16px;
@@ -1902,7 +1911,7 @@ footer span {
 
 .signal-card dt {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1912,15 +1921,15 @@ footer span {
   margin: 8px 0 5px;
   color: var(--green);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 400;
 }
 
 .signal-card > small {
   display: block;
   color: var(--muted);
-  font-size: 10px;
-  line-height: 1.4;
+  font-size: 16px;
+  line-height: 1.45;
 }
 
 .timing-signal {
@@ -1938,7 +1947,7 @@ footer span {
   padding: 14px 16px;
   color: var(--green-2);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -1971,14 +1980,15 @@ footer span {
 
 .flexgov-counterfactuals th {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 13px;
+  font-weight: 750;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .flexgov-counterfactuals td {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 16px;
 }
 
 .flexgov-counterfactuals tbody tr:last-child td {
@@ -1992,12 +2002,12 @@ footer span {
 
 .flexgov-counterfactuals td:first-child strong {
   color: var(--green);
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .flexgov-counterfactuals td:first-child span {
   margin-top: 3px;
-  font-size: 9px;
+  font-size: 13px;
 }
 
 .flexgov-counterfactuals .cf-winner {
@@ -2023,7 +2033,7 @@ footer span {
 
 .approval-comparison-heading > div:first-child > span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2040,7 +2050,7 @@ footer span {
 .approval-comparison > p,
 .approval-unavailable {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 16px;
   line-height: 1.55;
 }
 
@@ -2091,13 +2101,13 @@ footer span {
 
 .report-verification summary strong {
   color: var(--green-2);
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .report-verification summary small {
   margin-top: 3px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 13px;
 }
 
 .report-verification[open] summary {
@@ -2136,7 +2146,7 @@ footer span {
 
 .verification-grid span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -2146,14 +2156,14 @@ footer span {
   margin: 7px 0 5px;
   overflow-wrap: anywhere;
   color: var(--green-2);
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
 .verification-grid small,
 .report-verification > p {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 13px;
   line-height: 1.45;
 }
 
@@ -2191,13 +2201,13 @@ footer span {
   border-left: 3px solid var(--orange);
   background: rgba(238, 117, 64, 0.07);
   padding: 10px 12px;
-  font-size: 11px;
+  font-size: 15px;
   line-height: 1.45;
 }
 
 .alert-signal {
   color: #a34829;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2206,7 +2216,7 @@ footer span {
 .no-alerts {
   margin: 0;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 16px;
   line-height: 1.55;
 }
 
@@ -2216,9 +2226,9 @@ footer span {
   justify-content: space-between;
   gap: 12px;
   border-top: 1px solid var(--line);
-  padding: 9px 0;
+  padding: 12px 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 16px;
 }
 
 .data-availability li:first-child {
@@ -2227,7 +2237,7 @@ footer span {
 
 .data-availability li strong {
   color: var(--green-3);
-  font-size: 9px;
+  font-size: 13px;
   text-align: right;
 }
 
@@ -2293,7 +2303,7 @@ footer span {
   background: var(--paper);
   padding: 14px 16px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.55;
 }
 
@@ -2316,7 +2326,7 @@ footer span {
 
 .timing-sensitivity-table th {
   color: var(--green-2);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -2370,7 +2380,7 @@ footer span {
 
 .governor-evidence-grid dt {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2379,7 +2389,7 @@ footer span {
 .governor-evidence-grid dd {
   margin: 6px 0 0;
   color: var(--ink);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 750;
 }
 
@@ -2401,7 +2411,7 @@ footer span {
 .governor-actions code,
 .governor-actions small {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
 }
 
 @media (max-width: 800px) {

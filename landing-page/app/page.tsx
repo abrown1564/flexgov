@@ -85,16 +85,16 @@ export default function Home() {
         <div className="hero-copy">
           <p className="kicker">
             <span />
-            Governance observability for the agentic economy
+            Governance observability for DAOs
           </p>
           <h1>
-            See who really
+            See how voting power
             <br />
-            <em>determined</em> the outcome.
+            <em>shaped</em> the outcome.
           </h1>
           <p className="hero-deck">
-            FlexGov detects when governance safeguards are threatened and shows
-            whether a decision survives alternative voting assumptions.
+            FlexGov measures concentration and tests whether recorded ballots
+            produce the same winner under alternative voting assumptions.
           </p>
           <div className="hero-actions">
             <a className="button-primary" href="#how-it-works">
@@ -180,7 +180,7 @@ export default function Home() {
         </div>
 
         <div className="hero-foot">
-          <span>Analysis, not ideology.</span>
+          <span>Evidence, not verdicts.</span>
           <span>Community-defined safeguards.</span>
           <span>Transparent counterfactuals.</span>
         </div>
