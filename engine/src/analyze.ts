@@ -84,9 +84,10 @@ export function analyze(
   }
 
   const quorumTarget =
-    proposal.totalSupply != null && proposal.quorumFraction != null
+    proposal.quorumTarget ??
+    (proposal.totalSupply != null && proposal.quorumFraction != null
       ? proposal.totalSupply * proposal.quorumFraction
-      : null;
+      : null);
 
   // Put the observed collision rate beside explicit comparison assumptions.
   // The flat and compressed-window baselines are sensitivity checks—not an

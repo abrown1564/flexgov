@@ -44,6 +44,44 @@ export interface GovernanceHealthReport {
     retrievedAt: string | null;
     voteCount: number;
     sourceDataHash: string | null;
+    /** Provider-specific provenance sufficient to reproduce an indexed query. */
+    graphProvenance?: {
+      subgraphId: string;
+      network: string;
+      governorAddress: string;
+      deploymentId: string | null;
+      indexedBlockNumber: number | null;
+      indexedBlockHash: string | null;
+      hasIndexingErrors: boolean | null;
+    };
+  };
+  /** On-chain Governor facts remain separate from inferred engine findings. */
+  governanceContext?: {
+    network: string;
+    governorType: string;
+    governorAddress: string;
+    tokenAddress: string;
+    timelockAddress: string;
+    proposerAddress: string;
+    quorumVotes: number;
+    lifecycle: {
+      creationTransaction: string;
+      creationBlock: number;
+      votingStartBlock: number;
+      votingEndBlock: number;
+      queuedTransaction: string | null;
+      queuedBlock: number | null;
+      queuedAt: number | null;
+      executionEta: number | null;
+      executionTransaction: string | null;
+      executionBlock: number | null;
+      executedAt: number | null;
+    };
+    actions: Array<{
+      target: string;
+      valueWei: string;
+      signature: string;
+    }>;
   };
   methodology: {
     engineName: "@flexgov/engine";
@@ -109,6 +147,7 @@ export interface HealthReportInput {
   generatedAt: string;
   subject: GovernanceHealthReport["subject"];
   source: GovernanceHealthReport["source"];
+  governanceContext?: GovernanceHealthReport["governanceContext"];
   methodology?: Partial<GovernanceHealthReport["methodology"]>;
   snapshot: Snapshot;
   dataAvailability: GovernanceHealthReport["dataAvailability"];
@@ -151,6 +190,9 @@ export function buildGovernanceHealthReport(
     generatedAt: input.generatedAt,
     subject: input.subject,
     source: input.source,
+    ...(input.governanceContext
+      ? { governanceContext: input.governanceContext }
+      : {}),
     methodology: {
       engineName: "@flexgov/engine",
       engineVersion: "0.0.1",

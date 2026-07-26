@@ -2299,6 +2299,71 @@ footer span {
   padding-left: 18px;
 }
 
+.governor-evidence {
+  margin-top: 36px;
+  padding-top: 30px;
+  border-top: 1px solid var(--line);
+}
+
+.governor-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 20px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.governor-evidence-grid div {
+  padding: 16px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.governor-evidence-grid div:nth-child(3n) {
+  border-right: 0;
+}
+
+.governor-evidence-grid div:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+
+.governor-evidence-grid dt {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.governor-evidence-grid dd {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.governor-actions ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 16px 18px;
+  list-style: none;
+}
+
+.governor-actions li {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.governor-actions code,
+.governor-actions small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
 @media (max-width: 800px) {
   .live-data-section {
     grid-template-columns: 1fr;
@@ -2351,6 +2416,26 @@ footer span {
 
   .verification-grid {
     grid-template-columns: 1fr;
+  }
+
+  .governor-evidence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .governor-evidence-grid div,
+  .governor-evidence-grid div:nth-child(3n),
+  .governor-evidence-grid div:nth-last-child(-n + 3) {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .governor-evidence-grid div:last-child {
+    border-bottom: 0;
+  }
+
+  .governor-actions li {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 
   .verification-grid > div,

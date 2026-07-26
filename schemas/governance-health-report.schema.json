@@ -28,6 +28,7 @@
     "generatedAt": { "type": "string", "format": "date-time" },
     "subject": { "$ref": "#/$defs/subject" },
     "source": { "$ref": "#/$defs/source" },
+    "governanceContext": { "$ref": "#/$defs/governanceContext" },
     "methodology": { "$ref": "#/$defs/methodology" },
     "deterministicFindings": { "$ref": "#/$defs/deterministicFindings" },
     "dataAvailability": {
@@ -117,7 +118,97 @@
           "format": "date-time"
         },
         "voteCount": { "type": "integer", "minimum": 0 },
-        "sourceDataHash": { "$ref": "#/$defs/nullableString" }
+        "sourceDataHash": { "$ref": "#/$defs/nullableString" },
+        "graphProvenance": { "$ref": "#/$defs/graphProvenance" }
+      }
+    },
+    "graphProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subgraphId",
+        "network",
+        "governorAddress",
+        "deploymentId",
+        "indexedBlockNumber",
+        "indexedBlockHash",
+        "hasIndexingErrors"
+      ],
+      "properties": {
+        "subgraphId": { "type": "string" },
+        "network": { "type": "string" },
+        "governorAddress": { "type": "string" },
+        "deploymentId": { "$ref": "#/$defs/nullableString" },
+        "indexedBlockNumber": { "type": ["integer", "null"] },
+        "indexedBlockHash": { "$ref": "#/$defs/nullableString" },
+        "hasIndexingErrors": { "type": ["boolean", "null"] }
+      }
+    },
+    "governanceContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network",
+        "governorType",
+        "governorAddress",
+        "tokenAddress",
+        "timelockAddress",
+        "proposerAddress",
+        "quorumVotes",
+        "lifecycle",
+        "actions"
+      ],
+      "properties": {
+        "network": { "type": "string" },
+        "governorType": { "type": "string" },
+        "governorAddress": { "type": "string" },
+        "tokenAddress": { "type": "string" },
+        "timelockAddress": { "type": "string" },
+        "proposerAddress": { "type": "string" },
+        "quorumVotes": { "type": "number" },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "creationTransaction",
+            "creationBlock",
+            "votingStartBlock",
+            "votingEndBlock",
+            "queuedTransaction",
+            "queuedBlock",
+            "queuedAt",
+            "executionEta",
+            "executionTransaction",
+            "executionBlock",
+            "executedAt"
+          ],
+          "properties": {
+            "creationTransaction": { "type": "string" },
+            "creationBlock": { "type": "integer" },
+            "votingStartBlock": { "type": "integer" },
+            "votingEndBlock": { "type": "integer" },
+            "queuedTransaction": { "$ref": "#/$defs/nullableString" },
+            "queuedBlock": { "type": ["integer", "null"] },
+            "queuedAt": { "type": ["integer", "null"] },
+            "executionEta": { "type": ["integer", "null"] },
+            "executionTransaction": { "$ref": "#/$defs/nullableString" },
+            "executionBlock": { "type": ["integer", "null"] },
+            "executedAt": { "type": ["integer", "null"] }
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["target", "valueWei", "signature"],
+            "properties": {
+              "target": { "type": "string" },
+              "valueWei": { "type": "string" },
+              "signature": { "type": "string" }
+            }
+          }
+        }
       }
     },
     "methodology": {

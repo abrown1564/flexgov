@@ -20,6 +20,7 @@ import type {
   Snapshot as EngineSnapshot,
 } from "../../../engine/src/index.js";
 import arbitrumReportJson from "../data/arbitrum-health-report.json";
+import compoundReportJson from "../data/compound-393-health-report.json";
 import ensReportJson from "../data/ens-health-report.json";
 import gitcoinReportJson from "../data/gitcoin-health-report.json";
 import optimismReportJson from "../data/optimism-health-report.json";
@@ -76,6 +77,8 @@ type VoteQueryResponse = {
 const optimismReport =
   optimismReportJson as unknown as GovernanceHealthReport;
 const ensReport = ensReportJson as unknown as GovernanceHealthReport;
+const compoundReport =
+  compoundReportJson as unknown as GovernanceHealthReport;
 const arbitrumReport =
   arbitrumReportJson as unknown as GovernanceHealthReport;
 const uniswapReport =
@@ -87,6 +90,7 @@ const sushiReport = sushiReportJson as unknown as GovernanceHealthReport;
 // Reports are keyed by immutable proposal ID. The DAO's moving "latest"
 // pointer can therefore use a saved analysis only when it is an exact match.
 const savedReports = [
+  compoundReport,
   ensReport,
   arbitrumReport,
   uniswapReport,
@@ -180,6 +184,10 @@ const DAO_OPTIONS = [
   { name: "Gitcoin", space: "gitcoindao.eth" },
   { name: "Sushi", space: "sushigov.eth" },
   { name: "Optimism", space: "opcollective.eth" },
+  {
+    name: "Compound",
+    space: "0xc0da02939e1441f497fd74f78ce7decb17b66529",
+  },
 ] as const;
 
 type DaoOption = (typeof DAO_OPTIONS)[number];
@@ -272,10 +280,16 @@ export function LatestEnsProposal() {
     setDataSource("live");
     setTotalVotes(null);
 
-    // Optimism uses the saved #9b case study rather than pretending its cached
-    // 62,245-vote analysis belongs to whichever proposal happens to be latest.
-    if (dao.space === "opcollective.eth") {
-      setProposal(proposalFromReport(optimismReport));
+    // These case studies are pinned to immutable proposals. Compound is also
+    // generated server-side because a browser Graph request would expose the
+    // private gateway key.
+    if (
+      dao.space === "opcollective.eth" ||
+      dao.space === compoundReport.subject.spaceOrDaoId
+    ) {
+      const pinnedReport =
+        dao.space === "opcollective.eth" ? optimismReport : compoundReport;
+      setProposal(proposalFromReport(pinnedReport));
       setDataSource("precomputed");
       setStatus("idle");
       return;
@@ -559,17 +573,25 @@ export function LatestEnsProposal() {
           Live data / {selectedDao.name} governance
         </div>
         <h2>
-          Explore the {selectedDao.name === "Optimism" ? "" : "latest"}
+          Explore the{" "}
+          {selectedDao.name === "Optimism" || selectedDao.name === "Compound"
+            ? ""
+            : "latest"}
           <br />
           <em>
             {selectedDao.name}
-            {selectedDao.name === "Optimism" ? " case study." : " proposal."}
+            {selectedDao.name === "Optimism" ||
+            selectedDao.name === "Compound"
+              ? " case study."
+              : " proposal."}
           </em>
         </h2>
         <p>
-          {selectedDao.name === "Optimism"
-            ? "Inspect Special Voting Cycle #9b and its saved 62,245-vote analysis."
-            : "Inspect its choices, participation, status, and voting window using current governance data."}
+            {selectedDao.name === "Optimism"
+              ? "Inspect Special Voting Cycle #9b and its saved 62,245-vote analysis."
+              : selectedDao.name === "Compound"
+                ? "Inspect executed Governor Bravo proposal 393 using indexed Ethereum governance data."
+                : "Inspect its choices, participation, status, and voting window using current governance data."}
         </p>
         <div className="live-data-actions">
           <button
@@ -583,10 +605,13 @@ export function LatestEnsProposal() {
               ? "Fetching…"
               : selectedDao.name === "Optimism"
                 ? "Load Optimism case study"
+                : selectedDao.name === "Compound"
+                  ? "Load Compound report"
                 : `Fetch latest ${selectedDao.name} proposal`}
             <span aria-hidden="true">→</span>
           </button>
           {selectedDao.name !== "Optimism" &&
+            selectedDao.name !== "Compound" &&
             precomputedReportsBySpace.has(selectedDao.space) && (
               <button
                 className="saved-report-button"
@@ -603,8 +628,10 @@ export function LatestEnsProposal() {
         <div className="proposal-panel-bar">
           <span>Source</span>
           <strong>
-            {dataSource === "precomputed"
-              ? "Snapshot Hub · precomputed"
+            {selectedDao.name === "Compound"
+              ? "The Graph · Ethereum mainnet"
+              : dataSource === "precomputed"
+                ? "Snapshot Hub · precomputed"
               : "Snapshot Hub · live"}
           </strong>
         </div>
@@ -1053,30 +1080,38 @@ function FlexGovAnalysis({
             </div>
           </div>
           <ul>
-            <li>
-              <span>Voting power and ballots</span>
-              <strong>Available</strong>
-            </li>
-            <li>
-              <span>Voting window and timing</span>
-              <strong>Available</strong>
-            </li>
-            <li className="unavailable">
-              <span>Eligible-member turnout</span>
-              <strong>Unavailable from Snapshot</strong>
-            </li>
-            <li className="unavailable">
-              <span>On-chain quorum progress</span>
-              <strong>Unavailable from Snapshot</strong>
-            </li>
-            <li className="unavailable">
-              <span>Historical wallet provenance</span>
-              <strong>Not yet connected</strong>
-            </li>
+            {(report?.dataAvailability ?? [
+              {
+                id: "ballots",
+                label: "Voting power and ballots",
+                status: "available",
+                reason: null,
+              },
+              {
+                id: "timing",
+                label: "Voting window and timing",
+                status: "available",
+                reason: null,
+              },
+            ]).map((item) => (
+              <li
+                key={item.id}
+                className={
+                  item.status === "available" ? undefined : "unavailable"
+                }
+                title={item.reason ?? undefined}
+              >
+                <span>{item.label}</span>
+                <strong>{formatAvailability(item.status)}</strong>
+              </li>
+            ))}
           </ul>
         </section>
       </div>
 
+      {report?.governanceContext && (
+        <GovernorEvidence report={report} />
+      )}
       {report && <ReportVerification report={report} />}
     </section>
   );
@@ -1102,6 +1137,30 @@ function ReportVerification({
         <span aria-hidden="true">＋</span>
       </summary>
       <div className="verification-grid">
+        <VerificationItem
+          label="Source provider"
+          value={source.provider}
+          note={source.endpoint ?? "No public source URL recorded"}
+        />
+        {source.graphProvenance && (
+          <>
+            <VerificationItem
+              label="Graph subgraph"
+              value={source.graphProvenance.subgraphId}
+              note={`${source.graphProvenance.network} · retrieved ${source.retrievedAt ?? "time unavailable"}`}
+            />
+            <VerificationItem
+              label="Indexed block"
+              value={
+                source.graphProvenance.indexedBlockNumber?.toString() ?? null
+              }
+              note={
+                source.graphProvenance.indexedBlockHash ??
+                "Indexed block hash unavailable"
+              }
+            />
+          </>
+        )}
         <VerificationItem
           label="Report content hash"
           value={verification.reportHash}
@@ -1152,6 +1211,85 @@ function ReportVerification({
       </p>
     </details>
   );
+}
+
+/** Render authoritative Governor fields separately from engine interpretations. */
+function GovernorEvidence({ report }: { report: GovernanceHealthReport }) {
+  const context = report.governanceContext!;
+  const lifecycle = context.lifecycle;
+  return (
+    <section className="governor-evidence">
+      <div className="report-section-heading">
+        <span>05</span>
+        <div>
+          <h5>On-chain Governor evidence</h5>
+          <p>
+            Indexed lifecycle and contract facts supplied by The Graph, not
+            inferred from the outcome analysis.
+          </p>
+        </div>
+      </div>
+      <dl className="governor-evidence-grid">
+        <div>
+          <dt>Network</dt>
+          <dd>{context.network}</dd>
+        </div>
+        <div>
+          <dt>Governor</dt>
+          <dd title={context.governorAddress}>
+            {context.governorType} · {shortenAddress(context.governorAddress)}
+          </dd>
+        </div>
+        <div>
+          <dt>Authoritative quorum</dt>
+          <dd>{formatVotingPower(context.quorumVotes)} COMP</dd>
+        </div>
+        <div>
+          <dt>Voting blocks</dt>
+          <dd>
+            {lifecycle.votingStartBlock.toLocaleString()}–
+            {lifecycle.votingEndBlock.toLocaleString()}
+          </dd>
+        </div>
+        <div>
+          <dt>Queued</dt>
+          <dd>{lifecycle.queuedAt ? formatUnixTime(lifecycle.queuedAt) : "No"}</dd>
+        </div>
+        <div>
+          <dt>Executed</dt>
+          <dd>
+            {lifecycle.executedAt
+              ? formatUnixTime(lifecycle.executedAt)
+              : "No"}
+          </dd>
+        </div>
+      </dl>
+      <details className="support-disclosure governor-actions">
+        <summary>
+          <span>Contract actions</span>
+          <strong>{context.actions.length}</strong>
+        </summary>
+        <ul>
+          {context.actions.map((action, index) => (
+            <li key={`${action.target}-${index}`}>
+              <code>{shortenAddress(action.target)}</code>
+              <span>{action.signature}</span>
+              <small>{action.valueWei} wei</small>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </section>
+  );
+}
+
+function formatAvailability(
+  status: GovernanceHealthReport["dataAvailability"][number]["status"],
+): string {
+  return status
+    .split("-")
+    .map((word) => word[0]!.toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 function VerificationItem({

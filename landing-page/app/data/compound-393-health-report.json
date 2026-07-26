@@ -1,0 +1,322 @@
+{
+  "schema": "https://flexgov.org/schemas/governance-health-report/0.1.0",
+  "schemaVersion": "0.1.0",
+  "reportId": "the-graph:compound-governor:393",
+  "generatedAt": "2026-07-26T03:33:49.996Z",
+  "subject": {
+    "governanceSystem": "evm-governor",
+    "daoName": "Compound",
+    "spaceOrDaoId": "0xc0da02939e1441f497fd74f78ce7decb17b66529",
+    "proposalId": "393",
+    "title": "Compound Governor Contracts Upgrade",
+    "state": "EXECUTED",
+    "voteType": "basic",
+    "choices": [
+      "Against",
+      "For",
+      "Abstain"
+    ],
+    "votingWindow": {
+      "start": 1738254484,
+      "end": 1738492306
+    }
+  },
+  "source": {
+    "provider": "The Graph",
+    "endpoint": "https://thegraph.com/explorer/subgraphs/7nuSuPhUgKSg5uKRh8g5jyjZWE8DnvQw1mQtvDWpxrnh",
+    "retrievalMode": "precomputed",
+    "retrievedAt": "2026-07-26T03:33:49.996Z",
+    "voteCount": 29,
+    "sourceDataHash": "072a40224ea52b4d2dadffeb2b53992076a2ac7f4989e08f5b9c63a43c224f73",
+    "graphProvenance": {
+      "subgraphId": "7nuSuPhUgKSg5uKRh8g5jyjZWE8DnvQw1mQtvDWpxrnh",
+      "network": "ethereum-mainnet",
+      "governorAddress": "0xc0da02939e1441f497fd74f78ce7decb17b66529",
+      "deploymentId": "QmaXr5BxYCgpTUD3GV4PdfSyH34JhvKpkpmp89d761rRdW",
+      "indexedBlockNumber": 25614299,
+      "indexedBlockHash": "0x1d53dc32e950bd9669005161784b33e3587fc1899b5b8a1bd16aea38c52270e3",
+      "hasIndexingErrors": false
+    }
+  },
+  "governanceContext": {
+    "network": "ethereum-mainnet",
+    "governorType": "GovernorBravo",
+    "governorAddress": "0xc0da02939e1441f497fd74f78ce7decb17b66529",
+    "tokenAddress": "0xc00e94cb662c3520282e6f5717214004a7f26888",
+    "timelockAddress": "0x6d903f6003cca6255d85cca4d3b5e5146dc33925",
+    "proposerAddress": "0x447abe6a1fb43a8958ba1a179a50eb16c768bad1",
+    "quorumVotes": 400000,
+    "lifecycle": {
+      "creationTransaction": "0x2fc45841b4f7a43403ae930e30c680a4cbe0ac9699b6a78ccc26cc571e31b38a",
+      "creationBlock": 21725397,
+      "votingStartBlock": 21738537,
+      "votingEndBlock": 21758247,
+      "queuedTransaction": "0x2c8b270ea62d257af9d49863e530d2da50ecb993347e6b8fd3167e7a2ed2de88",
+      "queuedBlock": 21758256,
+      "queuedAt": 1738492415,
+      "executionEta": 1738665215,
+      "executionTransaction": "0x3fbc38a353a9821a178a4db20853bc30d4ece94d9dc22e4552386882979112e1",
+      "executionBlock": 21772576,
+      "executedAt": 1738665347
+    },
+    "actions": [
+      {
+        "target": "0x309a862bbc1a00e45506cb8a802d1ff10004c8c0",
+        "valueWei": "0",
+        "signature": "setNextProposalId()"
+      },
+      {
+        "target": "0x6d903f6003cca6255d85cca4d3b5e5146dc33925",
+        "valueWei": "0",
+        "signature": "setPendingAdmin(address)"
+      },
+      {
+        "target": "0x309a862bbc1a00e45506cb8a802d1ff10004c8c0",
+        "valueWei": "0",
+        "signature": "__acceptAdmin()"
+      }
+    ]
+  },
+  "methodology": {
+    "engineName": "@flexgov/engine",
+    "engineVersion": "0.0.1",
+    "engineCommit": null,
+    "analysisMode": "batch-final-state",
+    "ballotInterpretation": "first-selection",
+    "configurationHash": "47ae652241687e0d26016fe8730fc113b357a0f4d699d1f668771cd91e878cbb"
+  },
+  "deterministicFindings": {
+    "signals": {
+      "whaleShare": 0.3075002158732598,
+      "top3Share": 0.528688312506666,
+      "gini": 0.7884228808147049,
+      "turnout": null,
+      "quorumProgress": 1.8090616808987252,
+      "voterCount": 29,
+      "totalWeight": 723624.6723594901,
+      "dupTimestampRatio": 0.13793103448275862,
+      "votingWindowSeconds": 237822,
+      "averageVotesPerDay": 10.53561066680122,
+      "averageVotesPerHour": 0.4389837777833842,
+      "averageVotesPerMinute": 0.007316396296389737,
+      "expectedDupTimestampRatio": 0.0001177284298088388,
+      "dupTimestampExcess": 0.13781330605294978,
+      "dupTimestampLift": 1171.6034496232028,
+      "dupTimestampSensitivity": [
+        {
+          "activeHoursPerDay": 24,
+          "expectedRatio": 0.0001177284298088388
+        },
+        {
+          "activeHoursPerDay": 16,
+          "expectedRatio": 0.0001765876327303184
+        },
+        {
+          "activeHoursPerDay": 12,
+          "expectedRatio": 0.00023544349457771396
+        },
+        {
+          "activeHoursPerDay": 8,
+          "expectedRatio": 0.000353145195767568
+        }
+      ],
+      "walletsFor50Pct": 3,
+      "lateWeightShare": 0
+    },
+    "ballotInterpretations": {
+      "firstSelection": {
+        "status": "computed",
+        "outcomes": [
+          {
+            "rule": "1T1V",
+            "tally": {
+              "For": 723624.6723594901,
+              "Abstain": 0
+            },
+            "winner": "For",
+            "gini": 0.7884228808147049
+          },
+          {
+            "rule": "QV",
+            "tally": {
+              "For": 2383.220990325071,
+              "Abstain": 0
+            },
+            "winner": "For",
+            "gini": 0.7446917426846067
+          },
+          {
+            "rule": "1W1V",
+            "tally": {
+              "For": 28,
+              "Abstain": 1
+            },
+            "winner": "For",
+            "gini": 0
+          },
+          {
+            "rule": "GININORM",
+            "tally": {
+              "For": 107.64613159243908,
+              "Abstain": 0
+            },
+            "winner": "For",
+            "gini": 0.606590673955244
+          }
+        ],
+        "robustness": "robust"
+      },
+      "fullApproval": {
+        "status": "not-applicable",
+        "outcomes": null,
+        "robustness": null
+      }
+    },
+    "alerts": [
+      {
+        "id": "whale:moderate",
+        "signal": "whale",
+        "severity": "moderate",
+        "message": "Concentrated voting weight: top wallet 30.8%, top-3 52.9%",
+        "at": 1738464155,
+        "voteIndex": 29
+      },
+      {
+        "id": "quorum:met",
+        "signal": "quorum",
+        "severity": "none",
+        "message": "Quorum reached with 29 voter(s)",
+        "at": 1738464155,
+        "voteIndex": 29
+      }
+    ],
+    "severity": "moderate",
+    "recommendedRule": "1T1V",
+    "escalated": false
+  },
+  "dataAvailability": [
+    {
+      "id": "ballots",
+      "label": "On-chain voting power and individual ballots",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "timing",
+      "label": "Voting blocks, timestamps and transactions",
+      "status": "available",
+      "reason": "Start/end blocks are authoritative; display timestamps are interpolated from indexed creation and queue anchors."
+    },
+    {
+      "id": "quorum",
+      "label": "Authoritative Governor quorum",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "execution",
+      "label": "Queue and execution lifecycle",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "actions",
+      "label": "Contract targets and function signatures",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "forum",
+      "label": "Forum discussion context",
+      "status": "not-connected",
+      "reason": "The Governor subgraph indexes on-chain execution, not forum activity."
+    }
+  ],
+  "suggestedActions": [],
+  "limitations": [
+    "Batch final-state analysis does not run the stream engine's historical Sybil or collusion cluster detectors.",
+    "Contract signatures and targets are surfaced without asserting the intent or safety of the called actions.",
+    "Voting-window timestamps are derived from authoritative Graph-indexed blocks and lifecycle time anchors because this deployment does not expose historical block timestamps.",
+    "Wallet age, funding links and token-acquisition history are not connected."
+  ],
+  "verification": {
+    "reportHash": "0f60cc7262f270eb71a76bcd3f3e87283d4147218c80d0fef9aeed45f86582c2",
+    "storageUri": null,
+    "computeAttestation": null,
+    "chainAttestation": null
+  },
+  "evidencePreview": {
+    "ballots": [
+      {
+        "id": "0x3fb19771947072629c8eee7995a2ef23b72d4c8a-393",
+        "voter": "0x3fb19771947072629c8eee7995a2ef23b72d4c8a",
+        "votingPower": 80000,
+        "choice": 2,
+        "created": 1738254935
+      },
+      {
+        "id": "0x95f85372846ca6903dc945de6aa236550abb19c0-393",
+        "voter": "0x95f85372846ca6903dc945de6aa236550abb19c0",
+        "votingPower": 0.04,
+        "choice": 2,
+        "created": 1738288955
+      },
+      {
+        "id": "0xeffa64312a658bb9992d5902779d8c084f6d8de6-393",
+        "voter": "0xeffa64312a658bb9992d5902779d8c084f6d8de6",
+        "votingPower": 0.04,
+        "choice": 2,
+        "created": 1738289819
+      },
+      {
+        "id": "0x51e029ffd381562818db21bcb1d2f14ccab5ec3e-393",
+        "voter": "0x51e029ffd381562818db21bcb1d2f14ccab5ec3e",
+        "votingPower": 0.04,
+        "choice": 2,
+        "created": 1738290623
+      },
+      {
+        "id": "0x97a32d030cd9d1dd5a0111c3e36633669f29980d-393",
+        "voter": "0x97a32d030cd9d1dd5a0111c3e36633669f29980d",
+        "votingPower": 0.04,
+        "choice": 2,
+        "created": 1738291403
+      },
+      {
+        "id": "0xb49f8b8613be240213c1827e2e576044ffec7948-393",
+        "voter": "0xb49f8b8613be240213c1827e2e576044ffec7948",
+        "votingPower": 79999.92514989857,
+        "choice": 2,
+        "created": 1738293095
+      },
+      {
+        "id": "0x75f45eb5a53ef8bea513321eab61618441dcd71f-393",
+        "voter": "0x75f45eb5a53ef8bea513321eab61618441dcd71f",
+        "votingPower": 0.0216,
+        "choice": 2,
+        "created": 1738296239
+      },
+      {
+        "id": "0xfb2a916130ef311889e14d370c4a6009776400ab-393",
+        "voter": "0xfb2a916130ef311889e14d370c4a6009776400ab",
+        "votingPower": 0.1,
+        "choice": 2,
+        "created": 1738298303
+      },
+      {
+        "id": "0xc61beed11e4c98dd19894d89d02eb8b601965657-393",
+        "voter": "0xc61beed11e4c98dd19894d89d02eb8b601965657",
+        "votingPower": 0.10000000000000005,
+        "choice": 2,
+        "created": 1738310735
+      },
+      {
+        "id": "0x07a699bffd0067aa8c39ecc4348038a9fd39319e-393",
+        "voter": "0x07a699bffd0067aa8c39ecc4348038a9fd39319e",
+        "votingPower": 0,
+        "choice": 3,
+        "created": 1738323827
+      }
+    ]
+  }
+}

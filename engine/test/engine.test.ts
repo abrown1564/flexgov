@@ -50,6 +50,31 @@ describe("signals", () => {
   });
 });
 
+describe("authoritative Governor quorum", () => {
+  it("uses a direct indexed quorum target without inventing a supply fraction", () => {
+    const result = analyze(
+      {
+        id: "governor-quorum",
+        start: 1_000,
+        end: 2_000,
+        voteType: "basic",
+        quorumTarget: 400_000,
+      },
+      [
+        {
+          voter: "0x1",
+          weight: 500_000,
+          choice: "For",
+          timestamp: 1_500,
+        },
+      ],
+    );
+
+    expect(result.signals.quorumProgress).toBe(1.25);
+    expect(result.alerts.some((alert) => alert.id === "quorum:met")).toBe(true);
+  });
+});
+
 describe("choiceKey", () => {
   it("treats approval sets as order-insensitive", () => {
     expect(choiceKey(["A", "B"], { voteTypeHint: "approval" })).toBe(

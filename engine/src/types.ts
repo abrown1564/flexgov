@@ -64,6 +64,14 @@ export interface ProposalContext {
   totalSupply?: number;
   /** Quorum as a fraction of totalSupply (e.g. BonkDAO's 0.01). */
   quorumFraction?: number;
+  /**
+   * Direct quorum threshold in the same unit as VoteEvent.weight.
+   *
+   * Governor contracts often publish an authoritative fixed threshold without
+   * exposing the historical total-supply denominator needed to reconstruct it.
+   * Prefer this field when the indexed contract supplies that threshold.
+   */
+  quorumTarget?: number;
   /** Human-readable choice labels, if known. */
   choices?: string[];
 }
