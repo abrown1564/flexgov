@@ -28,6 +28,41 @@ import { gini } from "./signals.js";
  * can show the fairness impact of every rule, not just winner flips.
  */
 export function computeOutcomes(votes: readonly VoteEvent[]): RuleOutcome[] {
+  return computeOutcomesWithChoices(votes, (vote) => [
+    primaryChoice(vote.choice),
+  ]);
+}
+
+/**
+ * Approval interpretation of the same ballots.
+ *
+ * Every selected option receives the ballot's full transformed weight. This is
+ * intentionally separate from computeOutcomes(): first-selection plurality and
+ * approval voting answer different questions, so silently mixing them would
+ * make the report harder to audit.
+ *
+ * The caller must only use this for a proposal declared as approval voting.
+ * Array order is ignored and duplicate selections are counted once, matching
+ * the meaning of an approval ballot as a set of supported options.
+ */
+export function computeApprovalOutcomes(
+  votes: readonly VoteEvent[],
+): RuleOutcome[] {
+  return computeOutcomesWithChoices(votes, (vote) => {
+    if (!Array.isArray(vote.choice)) return [];
+    return [...new Set(vote.choice.map(String))];
+  });
+}
+
+/**
+ * Apply each counterfactual weight transform to one or more choices per ballot.
+ * Keeping the transform loop shared guarantees that plurality and approval
+ * comparisons differ only in ballot interpretation, not rule implementation.
+ */
+function computeOutcomesWithChoices(
+  votes: readonly VoteEvent[],
+  choicesForVote: (vote: VoteEvent) => readonly string[],
+): RuleOutcome[] {
   const g = gini(votes.map((v) => v.weight));
   const rules: Array<[CounterfactualRule, (w: number) => number]> = [
     ["1T1V", (w) => w],
@@ -40,9 +75,10 @@ export function computeOutcomes(votes: readonly VoteEvent[]): RuleOutcome[] {
     const tally: Record<string, number> = {};
     const transformed: number[] = [];
     for (const v of votes) {
-      const key = primaryChoice(v.choice);
       const w = fn(v.weight);
-      tally[key] = (tally[key] ?? 0) + w;
+      for (const key of choicesForVote(v)) {
+        tally[key] = (tally[key] ?? 0) + w;
+      }
       transformed.push(w);
     }
     return { rule, tally, winner: winnerOf(tally), gini: gini(transformed) };

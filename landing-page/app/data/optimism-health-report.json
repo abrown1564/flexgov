@@ -1,0 +1,365 @@
+{
+  "schema": "https://flexgov.org/schemas/governance-health-report/0.1.0",
+  "schemaVersion": "0.1.0",
+  "reportId": "snapshot:opcollective.eth:0x88583c43b196ec86cee45345611b582108f1d6933ab688a7cae992a6baa552a6",
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "subject": {
+    "governanceSystem": "snapshot",
+    "daoName": "Optimism",
+    "spaceOrDaoId": "opcollective.eth",
+    "proposalId": "0x88583c43b196ec86cee45345611b582108f1d6933ab688a7cae992a6baa552a6",
+    "title": "Title: Special Voting Cycle #9b: Protocol Delegation Elections",
+    "state": "closed",
+    "voteType": "approval",
+    "choices": [
+      "2Pi Network",
+      "Atlantis World",
+      "ParaSwap",
+      "Revert",
+      "QiDao Protocol",
+      "KyberSwap",
+      "Thales",
+      "BeethovenX & Balancer",
+      "Connext",
+      "Polynomial Protocol",
+      "Kwenta",
+      "Lyra",
+      "ENS",
+      "dHEDGE",
+      "Code4rena",
+      "Agora",
+      "Premia",
+      "LI.FI"
+    ],
+    "votingWindow": {
+      "start": 1673550587,
+      "end": 1674068987
+    }
+  },
+  "source": {
+    "provider": "Snapshot Hub API",
+    "endpoint": "https://hub.snapshot.org/graphql",
+    "retrievalMode": "precomputed",
+    "retrievedAt": null,
+    "voteCount": 62245,
+    "sourceDataHash": null
+  },
+  "methodology": {
+    "engineName": "@flexgov/engine",
+    "engineVersion": "0.0.1",
+    "engineCommit": "3344865",
+    "analysisMode": "batch-final-state",
+    "ballotInterpretation": "first-selection",
+    "configurationHash": null
+  },
+  "deterministicFindings": {
+    "signals": {
+      "whaleShare": 0.15674499809290504,
+      "top3Share": 0.41961723240996535,
+      "gini": 0.9936265753572768,
+      "turnout": null,
+      "quorumProgress": null,
+      "voterCount": 62245,
+      "totalWeight": 14629207.206239233,
+      "dupTimestampRatio": 0.2742388946903366,
+      "votingWindowSeconds": 518400,
+      "averageVotesPerDay": 10374.166666666668,
+      "averageVotesPerHour": 432.25694444444446,
+      "averageVotesPerMinute": 7.204282407407407,
+      "expectedDupTimestampRatio": 0.11314125554414645,
+      "dupTimestampExcess": 0.16109763914619013,
+      "dupTimestampLift": 2.4238629257860023,
+      "dupTimestampSensitivity": [
+        {
+          "activeHoursPerDay": 24,
+          "expectedRatio": 0.11314125554414645
+        },
+        {
+          "activeHoursPerDay": 16,
+          "expectedRatio": 0.16467667348445014
+        },
+        {
+          "activeHoursPerDay": 12,
+          "expectedRatio": 0.21336613710477026
+        },
+        {
+          "activeHoursPerDay": 8,
+          "expectedRatio": 0.30232952156554627
+        }
+      ],
+      "walletsFor50Pct": 4,
+      "lateWeightShare": 0.14349798672824185
+    },
+    "ballotInterpretations": {
+      "firstSelection": {
+        "status": "computed",
+        "outcomes": [
+          {
+            "rule": "1T1V",
+            "tally": {
+              "1": 124571.24378977901,
+              "2": 243554.05224701384,
+              "3": 1617050.6325423515,
+              "4": 34971.646495906745,
+              "5": 376175.41024838923,
+              "6": 39659.674935088784,
+              "7": 2849714.6207427727,
+              "8": 50432.06255279558,
+              "9": 364252.039532663,
+              "10": 288562.3902554432,
+              "11": 958337.4197319645,
+              "12": 803878.0745229569,
+              "13": 3940721.5638624993,
+              "14": 7787.033133998697,
+              "15": 3284.5734338006805,
+              "16": 7018.229190437606,
+              "17": 33294.91373490261,
+              "18": 2885941.6252865517
+            },
+            "winner": "13",
+            "gini": 0.9936265753572768
+          },
+          {
+            "rule": "QV",
+            "tally": {
+              "1": 14973.106085083866,
+              "2": 9612.214067286362,
+              "3": 16796.26267114072,
+              "4": 5130.055267089814,
+              "5": 6746.628387379648,
+              "6": 4950.743584291419,
+              "7": 11275.094077862166,
+              "8": 5822.93112338559,
+              "9": 5692.858731883724,
+              "10": 3431.808785031039,
+              "11": 18205.1493670595,
+              "12": 4536.052503071363,
+              "13": 21617.25522547548,
+              "14": 791.4294564489866,
+              "15": 581.5253708816788,
+              "16": 670.6998378843911,
+              "17": 1215.3567811567768,
+              "18": 10229.308824880838
+            },
+            "winner": "13",
+            "gini": 0.6604425722209475
+          },
+          {
+            "rule": "1W1V",
+            "tally": {
+              "1": 8920,
+              "2": 5594,
+              "3": 6353,
+              "4": 3502,
+              "5": 3718,
+              "6": 2711,
+              "7": 4300,
+              "8": 3132,
+              "9": 2201,
+              "10": 1441,
+              "11": 6164,
+              "12": 1221,
+              "13": 7065,
+              "14": 629,
+              "15": 641,
+              "16": 634,
+              "17": 657,
+              "18": 3362
+            },
+            "winner": "1",
+            "gini": 0
+          },
+          {
+            "rule": "GININORM",
+            "tally": {
+              "1": 8898.299258376655,
+              "2": 5566.058018416686,
+              "3": 6354.056866904449,
+              "4": 3479.521150629826,
+              "5": 3696.6972053965605,
+              "6": 2704.7581299108847,
+              "7": 4295.915480430986,
+              "8": 3124.9124833390947,
+              "9": 2202.7548805022807,
+              "10": 1437.7223658291869,
+              "11": 6191.538587015374,
+              "12": 1220.2795968293055,
+              "13": 7049.358777769121,
+              "14": 624.0315649657018,
+              "15": 634.7926968150031,
+              "16": 627.658463629868,
+              "17": 652.4136649080098,
+              "18": 3369.2126112608394
+            },
+            "winner": "1",
+            "gini": 0.009968268351989495
+          }
+        ],
+        "robustness": "rule-dependent"
+      },
+      "fullApproval": {
+        "status": "planned",
+        "outcomes": null,
+        "robustness": null
+      }
+    },
+    "alerts": [],
+    "severity": "none",
+    "recommendedRule": "QV",
+    "escalated": false
+  },
+  "dataAvailability": [
+    {
+      "id": "ballots",
+      "label": "Voting power and ballots",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "timing",
+      "label": "Voting window and timing",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "turnout",
+      "label": "Eligible-member turnout",
+      "status": "unavailable",
+      "reason": "Snapshot Hub does not provide an eligible-member denominator."
+    },
+    {
+      "id": "quorum",
+      "label": "On-chain quorum progress",
+      "status": "unavailable",
+      "reason": "This Snapshot report has no authoritative total-supply quorum input."
+    },
+    {
+      "id": "wallet-provenance",
+      "label": "Historical wallet provenance",
+      "status": "not-connected",
+      "reason": "Token acquisition, funding and wallet-history sources are not connected."
+    }
+  ],
+  "suggestedActions": [],
+  "limitations": [
+    "Counterfactual outcomes currently use each ballots first-listed selection, not the full approval tally.",
+    "Batch final-state analysis does not run the stream engines historical Sybil or collusion cluster detectors.",
+    "The complete 62,245-vote source archive is not embedded in this report; only a ten-ballot evidence preview is included.",
+    "Timing sensitivity scenarios are comparison assumptions and do not infer voter location."
+  ],
+  "verification": {
+    "reportHash": "cc73ba7e4ab68f18285319be4b8a721c599db72ac7f4dedc5ce45673f69cea81",
+    "storageUri": null,
+    "computeAttestation": null,
+    "chainAttestation": null
+  },
+  "evidencePreview": {
+    "ballots": [
+      {
+        "id": "0xb5f5c6bf742c9030ab649fb6769216e9688a9ac9f2c6b0776aa10aba32a6ccd9",
+        "voter": "0xB095AD5cc61E75458505Ca45d58DD177907Eb8c0",
+        "votingPower": 10.611471712121375,
+        "choice": [
+          6
+        ],
+        "created": 1673550711
+      },
+      {
+        "id": "0x2e981e2f31af64cfd6dcbc12130470e051183e83d1562607802320f0560ea056",
+        "voter": "0x36BCad3a6e12c5fd5371853e861Ffd044F835adF",
+        "votingPower": 6.497656224159021,
+        "choice": [
+          1,
+          12,
+          2
+        ],
+        "created": 1673550712
+      },
+      {
+        "id": "0x7e3db65c6dc6178be6631fc2123156e0ee6b558824ba676ea1e8e26dc2eef82a",
+        "voter": "0x7ABd480bDad5CCFe1AcC840cE408B1336b747ad3",
+        "votingPower": 20.851617940411778,
+        "choice": [
+          18
+        ],
+        "created": 1673550714
+      },
+      {
+        "id": "0x154e5449ff9afcc3fc0a0c368b44e5c22b6af2c26e22902190b22c2937a6d617",
+        "voter": "0x57511D586ad667B7e5032dFb51AcfCf41952e601",
+        "votingPower": 1.2291348706116918,
+        "choice": [
+          13
+        ],
+        "created": 1673550739
+      },
+      {
+        "id": "0x927a98b301467a313bd27def35b15324caf05a09d81efcac8f1fc876dcc76a45",
+        "voter": "0x46AfD77E66A240cD1A5C6E20DDfe6DBBcDe9C8aC",
+        "votingPower": 10.153098902226036,
+        "choice": [
+          11,
+          18
+        ],
+        "created": 1673550739
+      },
+      {
+        "id": "0x9ba0b5883e03b53a4ac597238d7e8d9d24825c22cf7bd7d8eabe729c9a61d9af",
+        "voter": "0x3B82B31bBE0DC3fE0f13D17f9a4d0455eF562e06",
+        "votingPower": 207.12586167543697,
+        "choice": [
+          18
+        ],
+        "created": 1673550741
+      },
+      {
+        "id": "0x64fc5e4000e2906079d10e859c0ac423b0fa08a3664a0a4d4368110bf2e088b0",
+        "voter": "0xB2f2d6Cac6221000a6C620B1579c74Fc837b9f1B",
+        "votingPower": 2.026377495575677,
+        "choice": [
+          1
+        ],
+        "created": 1673550743
+      },
+      {
+        "id": "0xc187f08b31e6818e3dbf8ef84576fc4e6e45de9a09197bcf065be718b7ddce09",
+        "voter": "0xdda7a01Df6c29dF1a81587a772afF6E4D69cd07b",
+        "votingPower": 10,
+        "choice": [
+          18
+        ],
+        "created": 1673550745
+      },
+      {
+        "id": "0x35170880ee48a0a9c6fc019c4ac3318eb980fd7a0fe0852c8b54b755d7d855b9",
+        "voter": "0xbd5bc121f9fB413d77Fdf39f6A2Aa45a9D8Bd6b2",
+        "votingPower": 2.000000698084547,
+        "choice": [
+          5,
+          6,
+          3,
+          2,
+          4,
+          7,
+          8,
+          9,
+          10,
+          11,
+          18,
+          13,
+          12
+        ],
+        "created": 1673550749
+      },
+      {
+        "id": "0x714ee8d3d71baedad6407ada7382338ece45521c2a64bb81021db300b08ebad4",
+        "voter": "0xF0ea58b65c82c48ce69f0ABD68D178e7764C4bA2",
+        "votingPower": 479.8937923374088,
+        "choice": [
+          18
+        ],
+        "created": 1673550752
+      }
+    ]
+  }
+}

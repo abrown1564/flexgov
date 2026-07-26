@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flexgov.org/schemas/governance-health-report/0.1.0",
+  "title": "FlexGov Governance Health Report",
+  "description": "Canonical, advisory and reproducible governance-analysis report.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schemaVersion",
+    "reportId",
+    "generatedAt",
+    "subject",
+    "source",
+    "methodology",
+    "deterministicFindings",
+    "dataAvailability",
+    "suggestedActions",
+    "limitations",
+    "verification"
+  ],
+  "properties": {
+    "schema": {
+      "const": "https://flexgov.org/schemas/governance-health-report/0.1.0"
+    },
+    "schemaVersion": { "const": "0.1.0" },
+    "reportId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "subject": { "$ref": "#/$defs/subject" },
+    "source": { "$ref": "#/$defs/source" },
+    "methodology": { "$ref": "#/$defs/methodology" },
+    "deterministicFindings": { "$ref": "#/$defs/deterministicFindings" },
+    "dataAvailability": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/dataAvailabilityItem" }
+    },
+    "suggestedActions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/suggestedAction" }
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "verification": { "$ref": "#/$defs/verification" },
+    "evidencePreview": { "$ref": "#/$defs/evidencePreview" }
+  },
+  "$defs": {
+    "nullableString": { "type": ["string", "null"] },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "governanceSystem",
+        "daoName",
+        "spaceOrDaoId",
+        "proposalId",
+        "title",
+        "state",
+        "voteType",
+        "choices",
+        "votingWindow"
+      ],
+      "properties": {
+        "governanceSystem": {
+          "enum": ["snapshot", "evm-governor", "realms", "other"]
+        },
+        "daoName": { "type": "string" },
+        "spaceOrDaoId": { "type": "string" },
+        "proposalId": { "type": "string" },
+        "title": { "type": "string" },
+        "state": { "type": "string" },
+        "voteType": {
+          "type": ["string", "null"],
+          "enum": [
+            "single",
+            "basic",
+            "approval",
+            "ranked",
+            "weighted",
+            "quadratic",
+            null
+          ]
+        },
+        "choices": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "votingWindow": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "end"],
+          "properties": {
+            "start": { "type": "integer" },
+            "end": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "endpoint",
+        "retrievalMode",
+        "retrievedAt",
+        "voteCount",
+        "sourceDataHash"
+      ],
+      "properties": {
+        "provider": { "type": "string" },
+        "endpoint": { "$ref": "#/$defs/nullableString" },
+        "retrievalMode": { "enum": ["live", "precomputed"] },
+        "retrievedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "voteCount": { "type": "integer", "minimum": 0 },
+        "sourceDataHash": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "methodology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engineName",
+        "engineVersion",
+        "engineCommit",
+        "analysisMode",
+        "ballotInterpretation",
+        "configurationHash"
+      ],
+      "properties": {
+        "engineName": { "const": "@flexgov/engine" },
+        "engineVersion": { "type": "string" },
+        "engineCommit": { "$ref": "#/$defs/nullableString" },
+        "analysisMode": {
+          "enum": ["batch-final-state", "stream-replay", "live-stream"]
+        },
+        "ballotInterpretation": {
+          "enum": [
+            "first-selection",
+            "first-selection-and-full-approval"
+          ]
+        },
+        "configurationHash": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "deterministicFindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signals",
+        "ballotInterpretations",
+        "alerts",
+        "severity",
+        "recommendedRule",
+        "escalated"
+      ],
+      "properties": {
+        "signals": {
+          "type": "object",
+          "description": "Versioned @flexgov/engine Signals payload.",
+          "additionalProperties": true
+        },
+        "ballotInterpretations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["firstSelection", "fullApproval"],
+          "properties": {
+            "firstSelection": { "$ref": "#/$defs/ballotInterpretation" },
+            "fullApproval": { "$ref": "#/$defs/ballotInterpretation" }
+          }
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "severity": {
+          "enum": ["none", "moderate", "strong", "extreme"]
+        },
+        "recommendedRule": {
+          "enum": ["1T1V", "QV", "1W1V", "GININORM"]
+        },
+        "escalated": { "type": "boolean" }
+      }
+    },
+    "ballotInterpretation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "outcomes", "robustness"],
+      "properties": {
+        "status": { "enum": ["computed", "planned", "not-applicable"] },
+        "outcomes": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "robustness": {
+          "type": ["string", "null"],
+          "enum": ["robust", "contested", "rule-dependent", "n/a", null]
+        }
+      }
+    },
+    "dataAvailabilityItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "status", "reason"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "status": {
+          "enum": ["available", "unavailable", "not-connected", "experimental"]
+        },
+        "reason": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "suggestedAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "basis", "authority"],
+      "properties": {
+        "action": { "type": "string" },
+        "basis": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "authority": { "enum": ["advisory", "pre-authorised-policy"] }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reportHash",
+        "storageUri",
+        "computeAttestation",
+        "chainAttestation"
+      ],
+      "properties": {
+        "reportHash": { "$ref": "#/$defs/nullableString" },
+        "storageUri": { "$ref": "#/$defs/nullableString" },
+        "computeAttestation": { "$ref": "#/$defs/nullableString" },
+        "chainAttestation": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "evidencePreview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ballots"],
+      "properties": {
+        "ballots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "voter", "votingPower", "choice", "created"],
+            "properties": {
+              "id": { "type": "string" },
+              "voter": { "type": "string" },
+              "votingPower": { "type": "number" },
+              "choice": {
+                "oneOf": [
+                  { "type": "number" },
+                  {
+                    "type": "array",
+                    "items": { "type": "number" }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": { "type": "number" }
+                  }
+                ]
+              },
+              "created": { "type": "integer" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

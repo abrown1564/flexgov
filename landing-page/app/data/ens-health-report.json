@@ -1,0 +1,247 @@
+{
+  "schema": "https://flexgov.org/schemas/governance-health-report/0.1.0",
+  "schemaVersion": "0.1.0",
+  "reportId": "snapshot:ens.eth:0x943e585d1a4996525c5c7d229401d604ea56fe08c2c9c615c44f048ba42487b7",
+  "generatedAt": "2026-07-26T01:49:33.034Z",
+  "subject": {
+    "governanceSystem": "snapshot",
+    "daoName": "ENS",
+    "spaceOrDaoId": "ens.eth",
+    "proposalId": "0x943e585d1a4996525c5c7d229401d604ea56fe08c2c9c615c44f048ba42487b7",
+    "title": "[7.1] [Social] SPP3: Marketplace RFP",
+    "state": "closed",
+    "voteType": "basic",
+    "choices": [
+      "For",
+      "Against",
+      "Abstain"
+    ],
+    "votingWindow": {
+      "start": 1783988115,
+      "end": 1784420115
+    }
+  },
+  "source": {
+    "provider": "Snapshot Hub API",
+    "endpoint": "https://hub.snapshot.org/graphql",
+    "retrievalMode": "precomputed",
+    "retrievedAt": "2026-07-26T01:49:33.034Z",
+    "voteCount": 67,
+    "sourceDataHash": "2cb892302c4ed2b115d45bdc3826e48c119786a4db882aa1a2516bf6074eb142"
+  },
+  "methodology": {
+    "engineName": "@flexgov/engine",
+    "engineVersion": "0.0.1",
+    "engineCommit": null,
+    "analysisMode": "batch-final-state",
+    "ballotInterpretation": "first-selection",
+    "configurationHash": "47ae652241687e0d26016fe8730fc113b357a0f4d699d1f668771cd91e878cbb"
+  },
+  "deterministicFindings": {
+    "signals": {
+      "whaleShare": 0.14138050787811454,
+      "top3Share": 0.3862630791508903,
+      "gini": 0.8487267095962563,
+      "turnout": null,
+      "quorumProgress": null,
+      "voterCount": 67,
+      "totalWeight": 1414622.1639861548,
+      "dupTimestampRatio": 0,
+      "votingWindowSeconds": 432000,
+      "averageVotesPerDay": 13.4,
+      "averageVotesPerHour": 0.5583333333333333,
+      "averageVotesPerMinute": 0.009305555555555556,
+      "expectedDupTimestampRatio": 0.0001527662846477762,
+      "dupTimestampExcess": -0.0001527662846477762,
+      "dupTimestampLift": 0,
+      "dupTimestampSensitivity": [
+        {
+          "activeHoursPerDay": 24,
+          "expectedRatio": 0.0001527662846477762
+        },
+        {
+          "activeHoursPerDay": 16,
+          "expectedRatio": 0.00022914080775826573
+        },
+        {
+          "activeHoursPerDay": 12,
+          "expectedRatio": 0.0003055095853037315
+        },
+        {
+          "activeHoursPerDay": 8,
+          "expectedRatio": 0.0004582299053725869
+        }
+      ],
+      "walletsFor50Pct": 5,
+      "lateWeightShare": 0.007177713209353233
+    },
+    "ballotInterpretations": {
+      "firstSelection": {
+        "status": "computed",
+        "outcomes": [
+          {
+            "rule": "1T1V",
+            "tally": {
+              "1": 1191365.534168904,
+              "2": 156420.0868523988,
+              "3": 66836.54296485189
+            },
+            "winner": "1",
+            "gini": 0.8487267095962563
+          },
+          {
+            "rule": "QV",
+            "tally": {
+              "1": 4078.8421304870303,
+              "2": 434.43746251177345,
+              "3": 439.35430707318886
+            },
+            "winner": "1",
+            "gini": 0.7593590710670284
+          },
+          {
+            "rule": "1W1V",
+            "tally": {
+              "1": 60,
+              "2": 2,
+              "3": 5
+            },
+            "winner": "1",
+            "gini": 0
+          },
+          {
+            "rule": "GININORM",
+            "tally": {
+              "1": 136.1243242093438,
+              "2": 9.17342756600133,
+              "3": 17.315479201478123
+            },
+            "winner": "1",
+            "gini": 0.41280920427998025
+          }
+        ],
+        "robustness": "robust"
+      },
+      "fullApproval": {
+        "status": "not-applicable",
+        "outcomes": null,
+        "robustness": null
+      }
+    },
+    "alerts": [],
+    "severity": "none",
+    "recommendedRule": "1T1V",
+    "escalated": false
+  },
+  "dataAvailability": [
+    {
+      "id": "ballots",
+      "label": "Voting power and ballots",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "timing",
+      "label": "Voting window and timing",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "turnout",
+      "label": "Eligible-member turnout",
+      "status": "unavailable",
+      "reason": "Snapshot Hub does not provide an eligible-member denominator."
+    },
+    {
+      "id": "quorum",
+      "label": "On-chain quorum progress",
+      "status": "unavailable",
+      "reason": "This Snapshot report has no authoritative total-supply quorum input."
+    }
+  ],
+  "suggestedActions": [],
+  "limitations": [
+    "Batch final-state analysis does not run the stream engine's historical Sybil or collusion cluster detectors.",
+    "The complete source archive is committed by hash but is not embedded in this compact report."
+  ],
+  "verification": {
+    "reportHash": "27d58e8881e7cedb2b8d3a59994e444cf57ca4561b760df7c222284672776032",
+    "storageUri": null,
+    "computeAttestation": null,
+    "chainAttestation": null
+  },
+  "evidencePreview": {
+    "ballots": [
+      {
+        "id": "0xbf9760e23d366977a5b5bc02783f17e3f46c98c9cf51e16397f066543c08e5ec",
+        "voter": "0x2F2F665974261C4129b1DC6c359BD259CD66f78A",
+        "votingPower": 1.1969834823104752,
+        "choice": 1,
+        "created": 1783988376
+      },
+      {
+        "id": "0x6d3b006a00fd17832cf108281699673311e125c5ebc413bb20a05eeeff86f549",
+        "voter": "0x88F659b4B6D5614B991c6404b34f821e10390eC0",
+        "votingPower": 0.05,
+        "choice": 1,
+        "created": 1783988556
+      },
+      {
+        "id": "0xc6a24d44f19913ac6c0e91310d914112c0b5b0544dd890ccf408c83f85b58211",
+        "voter": "0x76A6D08b82034b397E7e09dAe4377C18F132BbB8",
+        "votingPower": 15769.80203853485,
+        "choice": 1,
+        "created": 1783994050
+      },
+      {
+        "id": "0x0edd8f65295569c4c20635d49b21852c8980a87903b8e3ac376b18bb245678d4",
+        "voter": "0xd5D171a9AA125AF13216C3213B5A9Fc793FcCF2c",
+        "votingPower": 155748.01791651273,
+        "choice": 1,
+        "created": 1784010880
+      },
+      {
+        "id": "0x458dbc40d74fa747b0e802c45006785c8cd8bfbbacd1f15217704e318cb7e8e8",
+        "voter": "0x866B3c4994e1416B7C738B9818b31dC246b95eEE",
+        "votingPower": 190668.2949798752,
+        "choice": 1,
+        "created": 1784010934
+      },
+      {
+        "id": "0x9e623ee9a84f69c8ebe792b4036b13dff0a8b026d4b9778e580eab85bccc4226",
+        "voter": "0x7Ae94d7712b7EDB9BB2C0Ee6D71081a6D8710c0b",
+        "votingPower": 10158.961334584643,
+        "choice": 1,
+        "created": 1784015624
+      },
+      {
+        "id": "0x68bee8ac28d6e8da92afd7770894acf36aa252bd6fa5396ea821134451877433",
+        "voter": "0xf3427890604BC8BE673517B9Dde1bab548aE3329",
+        "votingPower": 9960.491651604538,
+        "choice": 1,
+        "created": 1784021458
+      },
+      {
+        "id": "0x953d29b51e55dd68f4617c9b0f7276de49ca9faa4726e25b049b63421a8f348d",
+        "voter": "0x534631Bcf33BDb069fB20A93d2fdb9e4D4dD42CF",
+        "votingPower": 137162.82623886014,
+        "choice": 1,
+        "created": 1784024155
+      },
+      {
+        "id": "0x5a05bfc3faaa2283355bfd059489946427d8c503732d7a1258f3fa34a3a7a8dd",
+        "voter": "0x019Ed608dD806b80193942F2A960e7AC8aBb2EE3",
+        "votingPower": 1,
+        "choice": 1,
+        "created": 1784027342
+      },
+      {
+        "id": "0xa94fd4a8b5353cfe59e8dd17a595a74c0e7cfabdf31eec68fcfe4b0cc8401ec9",
+        "voter": "0x659F20EE4DEA1F11f5c840c410337Fbac3E5DADC",
+        "votingPower": 1,
+        "choice": 1,
+        "created": 1784032496
+      }
+    ]
+  }
+}

@@ -10,6 +10,11 @@ import {
   gini,
   replay,
   analyze,
+  buildGovernanceHealthReport,
+  canonicalJson,
+  computeApprovalOutcomes,
+  hashGovernanceHealthReport,
+  sha256Hex,
   buildReport,
   VULNERABILITY_MATRIX,
   detectorApplies,
@@ -346,5 +351,141 @@ describe("batch analyze() matches replay()'s final frame (non-cluster fields)", 
 
   it("agrees on escalation", () => {
     expect(batched.escalated).toBe(replayed.escalated);
+  });
+});
+
+describe("canonical Governance Health Report", () => {
+  it("separates deterministic findings from actions and unverified provenance", () => {
+    const proposal: ProposalContext = {
+      id: "report-test",
+      title: "Report test",
+      start: 0,
+      end: 1000,
+      voteType: "approval",
+      choices: ["A", "B"],
+    };
+    const ballotEvents = [
+      { voter: "a", weight: 10, choice: [1, 2], timestamp: 100 },
+      { voter: "b", weight: 5, choice: [2], timestamp: 200 },
+    ];
+    const snapshot = analyze(proposal, ballotEvents);
+    const report = buildGovernanceHealthReport({
+      reportId: "snapshot:test:report-test",
+      generatedAt: "2026-07-26T00:00:00.000Z",
+      subject: {
+        governanceSystem: "snapshot",
+        daoName: "Test DAO",
+        spaceOrDaoId: "test.eth",
+        proposalId: proposal.id,
+        title: proposal.title!,
+        state: "closed",
+        voteType: "approval",
+        choices: proposal.choices!,
+        votingWindow: { start: proposal.start, end: proposal.end },
+      },
+      source: {
+        provider: "test",
+        endpoint: null,
+        retrievalMode: "precomputed",
+        retrievedAt: null,
+        voteCount: 1,
+        sourceDataHash: null,
+      },
+      snapshot,
+      ballotEvents,
+      dataAvailability: [],
+    });
+
+    expect(report.deterministicFindings.signals.totalWeight).toBe(15);
+    expect(report.deterministicFindings.ballotInterpretations.fullApproval.status)
+      .toBe("computed");
+    expect(
+      report.deterministicFindings.ballotInterpretations.fullApproval.outcomes
+        ?.find((outcome) => outcome.rule === "1T1V")?.tally,
+    ).toEqual({ "1": 10, "2": 15 });
+    expect(report.methodology.ballotInterpretation).toBe(
+      "first-selection-and-full-approval",
+    );
+    expect(report.suggestedActions).toEqual([]);
+    expect(report.verification.reportHash).toBeNull();
+  });
+
+  it("counts every approved option once while preserving rule transforms", () => {
+    const outcomes = computeApprovalOutcomes([
+      // Duplicate option 2 is deliberately malformed input; set semantics
+      // prevent it from giving one ballot extra influence over that option.
+      { voter: "a", weight: 9, choice: [1, 2, 2], timestamp: 100 },
+      { voter: "b", weight: 4, choice: [2, 3], timestamp: 200 },
+    ]);
+
+    expect(outcomes.find((outcome) => outcome.rule === "1T1V")?.tally).toEqual({
+      "1": 9,
+      "2": 13,
+      "3": 4,
+    });
+    expect(outcomes.find((outcome) => outcome.rule === "QV")?.tally).toEqual({
+      "1": 3,
+      "2": 5,
+      "3": 2,
+    });
+  });
+
+  it("serialises equivalent key orders to identical bytes and hashes", async () => {
+    const left = { z: 3, nested: { b: 2, a: 1 } };
+    const right = { nested: { a: 1, b: 2 }, z: 3 };
+
+    expect(canonicalJson(left)).toBe(canonicalJson(right));
+    expect(await sha256Hex(canonicalJson(left))).toBe(
+      await sha256Hex(canonicalJson(right)),
+    );
+  });
+
+  it("does not make the report hash depend on its mutable verification envelope", async () => {
+    const proposal: ProposalContext = {
+      id: "hash-test",
+      start: 0,
+      end: 100,
+      voteType: "single",
+      choices: ["For", "Against"],
+    };
+    const snapshot = analyze(proposal, [
+      { voter: "a", weight: 1, choice: 1, timestamp: 50 },
+    ]);
+    const report = buildGovernanceHealthReport({
+      reportId: "snapshot:test:hash-test",
+      generatedAt: "2026-07-26T00:00:00.000Z",
+      subject: {
+        governanceSystem: "snapshot",
+        daoName: "Test DAO",
+        spaceOrDaoId: "test.eth",
+        proposalId: proposal.id,
+        title: "Hash test",
+        state: "closed",
+        voteType: "single",
+        choices: proposal.choices!,
+        votingWindow: { start: proposal.start, end: proposal.end },
+      },
+      source: {
+        provider: "test",
+        endpoint: null,
+        retrievalMode: "precomputed",
+        retrievedAt: null,
+        voteCount: 1,
+        sourceDataHash: null,
+      },
+      snapshot,
+      dataAvailability: [],
+    });
+
+    const initialHash = await hashGovernanceHealthReport(report);
+    const anchored = {
+      ...report,
+      verification: {
+        ...report.verification,
+        reportHash: initialHash,
+        storageUri: "0g://example",
+      },
+    };
+    expect(await hashGovernanceHealthReport(anchored)).toBe(initialHash);
   });
 });

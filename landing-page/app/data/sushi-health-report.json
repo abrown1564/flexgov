@@ -1,0 +1,252 @@
+{
+  "schema": "https://flexgov.org/schemas/governance-health-report/0.1.0",
+  "schemaVersion": "0.1.0",
+  "reportId": "snapshot:sushigov.eth:0x26fad0eda6e06d759a6a9f69d96b6ced97e8115f5ccaa7d2f96e32f9b0cec578",
+  "generatedAt": "2026-07-26T01:57:29.176Z",
+  "subject": {
+    "governanceSystem": "snapshot",
+    "daoName": "Sushi",
+    "spaceOrDaoId": "sushigov.eth",
+    "proposalId": "0x26fad0eda6e06d759a6a9f69d96b6ced97e8115f5ccaa7d2f96e32f9b0cec578",
+    "title": "MasterChef LP Migration to V3 + Protocol-Deployed Liquidity [Implementation]",
+    "state": "closed",
+    "voteType": "basic",
+    "choices": [
+      "For",
+      "Against",
+      "Abstain"
+    ],
+    "votingWindow": {
+      "start": 1769022000,
+      "end": 1769662740
+    }
+  },
+  "source": {
+    "provider": "Snapshot Hub API",
+    "endpoint": "https://hub.snapshot.org/graphql",
+    "retrievalMode": "precomputed",
+    "retrievedAt": "2026-07-26T01:57:29.176Z",
+    "voteCount": 18,
+    "sourceDataHash": "34f5fc27a5b0e3de2ebae74bf15f38482e140626d144e261956186f1f9319db6"
+  },
+  "methodology": {
+    "engineName": "@flexgov/engine",
+    "engineVersion": "0.0.1",
+    "engineCommit": null,
+    "analysisMode": "batch-final-state",
+    "ballotInterpretation": "first-selection",
+    "configurationHash": "47ae652241687e0d26016fe8730fc113b357a0f4d699d1f668771cd91e878cbb"
+  },
+  "deterministicFindings": {
+    "signals": {
+      "whaleShare": 0.9969313043939506,
+      "top3Share": 0.9999652903004709,
+      "gini": 0.9440533141733145,
+      "turnout": null,
+      "quorumProgress": null,
+      "voterCount": 18,
+      "totalWeight": 5216119.126269131,
+      "dupTimestampRatio": 0,
+      "votingWindowSeconds": 640740,
+      "averageVotesPerDay": 2.4271935574491996,
+      "averageVotesPerHour": 0.10113306489371664,
+      "averageVotesPerMinute": 0.001685551081561944,
+      "expectedDupTimestampRatio": 0.00002653149131781607,
+      "dupTimestampExcess": -0.00002653149131781607,
+      "dupTimestampLift": 0,
+      "dupTimestampSensitivity": [
+        {
+          "activeHoursPerDay": 24,
+          "expectedRatio": 0.00002653149131781607
+        },
+        {
+          "activeHoursPerDay": 16,
+          "expectedRatio": 0.00003979698853384672
+        },
+        {
+          "activeHoursPerDay": 12,
+          "expectedRatio": 0.00005306232012158851
+        },
+        {
+          "activeHoursPerDay": 8,
+          "expectedRatio": 0.00007959248642686045
+        }
+      ],
+      "walletsFor50Pct": 1,
+      "lateWeightShare": 0
+    },
+    "ballotInterpretations": {
+      "firstSelection": {
+        "status": "computed",
+        "outcomes": [
+          {
+            "rule": "1T1V",
+            "tally": {
+              "1": 5216119.104069131,
+              "3": 0.022199999999999998
+            },
+            "winner": "1",
+            "gini": 0.9440533141733145
+          },
+          {
+            "rule": "QV",
+            "tally": {
+              "1": 2463.80982625989,
+              "3": 0.14899664425751338
+            },
+            "winner": "1",
+            "gini": 0.9310778417819214
+          },
+          {
+            "rule": "1W1V",
+            "tally": {
+              "1": 17,
+              "3": 1
+            },
+            "winner": "1",
+            "gini": 0
+          },
+          {
+            "rule": "GININORM",
+            "tally": {
+              "1": 18.306715202029693,
+              "3": 0.8081350243798625
+            },
+            "winner": "1",
+            "gini": 0.18240206532001757
+          }
+        ],
+        "robustness": "robust"
+      },
+      "fullApproval": {
+        "status": "not-applicable",
+        "outcomes": null,
+        "robustness": null
+      }
+    },
+    "alerts": [
+      {
+        "id": "whale:extreme",
+        "signal": "whale",
+        "severity": "extreme",
+        "message": "Single wallet controls 99.7% of voting weight",
+        "at": 1769501627,
+        "voteIndex": 18
+      }
+    ],
+    "severity": "extreme",
+    "recommendedRule": "1W1V",
+    "escalated": false
+  },
+  "dataAvailability": [
+    {
+      "id": "ballots",
+      "label": "Voting power and ballots",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "timing",
+      "label": "Voting window and timing",
+      "status": "available",
+      "reason": null
+    },
+    {
+      "id": "turnout",
+      "label": "Eligible-member turnout",
+      "status": "unavailable",
+      "reason": "Snapshot Hub does not provide an eligible-member denominator."
+    },
+    {
+      "id": "quorum",
+      "label": "On-chain quorum progress",
+      "status": "unavailable",
+      "reason": "This Snapshot report has no authoritative total-supply quorum input."
+    }
+  ],
+  "suggestedActions": [],
+  "limitations": [
+    "Batch final-state analysis does not run the stream engine's historical Sybil or collusion cluster detectors.",
+    "The complete source archive is committed by hash but is not embedded in this compact report."
+  ],
+  "verification": {
+    "reportHash": "4a883d6f6363c24c65eeab373e4de8e6a89869962b00a1d930230d86774fb67d",
+    "storageUri": null,
+    "computeAttestation": null,
+    "chainAttestation": null
+  },
+  "evidencePreview": {
+    "ballots": [
+      {
+        "id": "0xe544f1b764ee963f6ad08855d7cf680aa466a6aa866f3d57cb6dec06b5c25445",
+        "voter": "0xE6E2976f69C713F3e46Ac67b9869330a14026F4f",
+        "votingPower": 13869.373396099667,
+        "choice": 1,
+        "created": 1769029706
+      },
+      {
+        "id": "0xeb2236b1a9bd876ae1738cf6b72ea9e8073582ef7723d874868d3dcc06178a7c",
+        "voter": "0xd3811Eb19A779eCB57d57f2E43D419b71Ca8622e",
+        "votingPower": 1.0087140898222604,
+        "choice": 1,
+        "created": 1769043843
+      },
+      {
+        "id": "0xdd3937dad55800e934f8eead82d888f0c15a9f08e4e0ac1ab4c1f2c253521e06",
+        "voter": "0xCEF28ce7884Ae973990fb826C1986afaa9319B9A",
+        "votingPower": 0.22503271777712597,
+        "choice": 1,
+        "created": 1769057133
+      },
+      {
+        "id": "0x8bf19c742aae86562ef1dbd9b8fb20eeef92380fbe6ac5f86871d0c34647c58e",
+        "voter": "0x13a4879a3a2BEE3A05b17468b08753e2Fd3e2AAa",
+        "votingPower": 0.013,
+        "choice": 1,
+        "created": 1769063501
+      },
+      {
+        "id": "0x7df26ecca3b55358b4622b0bcd85fd66fced4bcfa6a18cf98617684e70f79244",
+        "voter": "0x5Eb1871f828A648B06E156466AA0292D54bEBaCd",
+        "votingPower": 0.03,
+        "choice": 1,
+        "created": 1769064370
+      },
+      {
+        "id": "0xf2f3b4d8e6fa15f08267a67a1c27e49af45a747cc3b463e257b6907a49d2bb84",
+        "voter": "0xD57dcb52b93Dfd5133084779a4cBC57Cbb9b6c32",
+        "votingPower": 1.0767611405119386,
+        "choice": 1,
+        "created": 1769070898
+      },
+      {
+        "id": "0x99750e57b27235554e497c8ca17bf9947ce9e210bbeecea0b13930707cd4fac0",
+        "voter": "0x1aD97dbD578ce2f61Db32456a7cD2Ae9997e7f7a",
+        "votingPower": 0.008999999999999998,
+        "choice": 1,
+        "created": 1769079769
+      },
+      {
+        "id": "0x3edb892bce9633c38461bb6d57649440a2ed7f62ab8a240602554899c8465668",
+        "voter": "0x1A93bFe2C10F24D27221c36B470eCbFca6e6bfce",
+        "votingPower": 0.015099999999999999,
+        "choice": 1,
+        "created": 1769079935
+      },
+      {
+        "id": "0xb4645581a89e6eac4bf1190956c952584a4028cbee7f59621ece7f9b01991a35",
+        "voter": "0x015122A625b45f68E6D795C0Ab99fC7107e4c3B9",
+        "votingPower": 28.621680800146866,
+        "choice": 1,
+        "created": 1769084633
+      },
+      {
+        "id": "0x3a49c53a19ab52f295ab8dfa01fa852d39514657d9c43eab73c2c7b7314f8135",
+        "voter": "0x811E77F32b4B6934F79b5A31F9770D954ACc3456",
+        "votingPower": 0.024999999999999998,
+        "choice": 1,
+        "created": 1769089082
+      }
+    ]
+  }
+}

@@ -76,3 +76,47 @@ To resist gaming, the eventual detector should combine:
 
 These measurements should remain decomposable and visible. A flagged temporal
 cluster is evidence for inspection, not proof of identity linkage or wrongdoing.
+
+## Ideal Governance Health Report
+
+FlexGov's principal product output should be a reproducible Governance Health
+Report rather than an unexplained risk score or an instruction to accept or
+reject a proposal. The report supplies evidence and comparisons; humans retain
+authority unless their community has separately adopted a pre-authorised policy.
+
+An ideal full report contains:
+
+1. **Proposal identity and scope:** governance system, DAO, proposal ID, voting
+   type, choices, voting window, execution state, affected contracts and
+   treasury value where available.
+2. **Participation and concentration:** voter count, eligible-member turnout,
+   quorum progress and margin, largest-wallet share, top-three share, Gini
+   coefficient, minimum controlling coalition and delegation concentration.
+3. **Temporal and behavioural evidence:** late voting, late acquisition of
+   voting power, first-time voters, multi-window timing clusters, ballot
+   similarity, voting-power similarity and historical wallet behaviour.
+4. **Proposal and execution characteristics:** treasury percentage affected,
+   new privileged addresses or permissions, forum discussion activity,
+   timelock, veto or circuit-breaker availability, and the delay between
+   approval and execution.
+5. **Historical comparison:** proposal-level signals compared with an
+   appropriate DAO and proposal-type baseline, including sample size and
+   percentile methodology.
+6. **Ballot interpretations and counterfactuals:** the recorded result, a
+   first-selection plurality view, a full approval tally where applicable, and
+   explicitly defined alternative weighting mechanisms. Unlike mechanisms must
+   not be silently averaged.
+7. **Findings and suggested actions:** observable findings remain separate from
+   optional responses such as requesting explanation, notifying a council,
+   opening review, or applying a previously authorised delay.
+8. **Data availability and limitations:** every missing source, unsupported
+   inference and experimental method is stated rather than represented as zero.
+9. **Reproducibility and provenance:** source references, input hash, report
+   hash, engine and configuration versions, calculation timestamp, storage
+   reference and any compute or onchain attestation.
+
+The machine-readable and human-readable versions must describe the same report.
+The complete report may be stored offchain while a compact digest and provenance
+record are attested onchain. Such an attestation proves which inputs, code and
+configuration produced the report; it does not prove that an interpretation is
+correct.
