@@ -44,6 +44,12 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    // GitHub Pages hosts this repository below /flexgov. Applying the prefix at
+    // Vite's asset layer keeps vinext's root route statically prerenderable;
+    // Next basePath currently causes vinext to skip index.html entirely.
+    base: process.env.PAGES_BASE_PATH
+      ? `${process.env.PAGES_BASE_PATH.replace(/\/$/, "")}/`
+      : undefined,
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,
