@@ -10,7 +10,7 @@ const analysisSteps = [
   {
     number: "01",
     title: "Observe",
-    body: "Index proposal, balance, delegation, quorum, timing, and execution data from the governance system.",
+    body: "Read proposal, ballot, voting-power and timing data supplied by the connected governance source.",
   },
   {
     number: "02",
@@ -25,30 +25,30 @@ const analysisSteps = [
   {
     number: "04",
     title: "Respond",
-    body: "Apply the community’s pre-authorised policy: explain, warn, review, delay, rerun, or replace a rule.",
+    body: "Produce advisory findings that a community can use in its own review and response process.",
   },
 ];
 
 const modes = [
   {
     name: "Ensemble",
-    status: "MVP",
+    status: "Implemented",
     body: "Runs supported rules in parallel and reports whether the outcome is robust or mechanism-sensitive.",
   },
   {
     name: "Flex",
-    status: "MVP",
-    body: "Applies deterministic safeguards selected by the community before a vote begins.",
+    status: "Experimental",
+    body: "Evaluates deterministic thresholds and produces advisory findings; it does not enact governance changes.",
   },
   {
     name: "Modular",
-    status: "MVP",
-    body: "Lets each DAO choose its detectors, thresholds, eligible mechanisms, and responses.",
+    status: "Planned",
+    body: "Would let each DAO configure detectors, thresholds, eligible mechanisms, and responses.",
   },
   {
     name: "ILS",
-    status: "Research",
-    body: "Explores meaningful evidence of informed participation and deliberative contribution.",
+    status: "Planned",
+    body: "Research direction for evidence of informed participation and deliberative contribution.",
   },
 ];
 
@@ -119,7 +119,7 @@ export default function Home() {
                 <i />
               </div>
               <span>Proposal analysis / BIP #76</span>
-              <strong>Live</strong>
+              <strong>Illustrative</strong>
             </div>
             <div className="analysis-heading">
               <div>
@@ -174,8 +174,8 @@ export default function Home() {
             <strong>Review triggered</strong>
           </div>
           <div className="floating-tag tag-b">
-            <span>Data indexed by</span>
-            <strong>The Graph</strong>
+            <span>Graph-backed report</span>
+            <strong>Compound 393</strong>
           </div>
         </div>
 
@@ -329,9 +329,9 @@ export default function Home() {
             <em>Community-defined rules.</em>
           </h2>
           <p>
-            A DAO can choose advisory analysis, pre-authorised escalation, or a
-            binding rule response. Adaptability is legitimate when the policy is
-            explicit before voting begins.
+            The prototype provides advisory analysis and threshold findings.
+            Configurable escalation and binding rule responses remain planned
+            and would require explicit community authorisation before voting.
           </p>
         </div>
         <div className="mode-grid">

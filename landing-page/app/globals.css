@@ -1339,9 +1339,9 @@ footer span {
 /* First live-data slice: one explicit request, kept visually separate from analysis. */
 .live-data-section {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(440px, 1.2fr);
-  gap: clamp(48px, 8vw, 120px);
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 64px);
+  align-items: start;
   padding: 100px clamp(24px, 7vw, 110px);
   background: var(--paper);
   border-bottom: 1px solid var(--line);
@@ -1397,12 +1397,19 @@ footer span {
   line-height: 0.98;
 }
 
+.live-data-intro {
+  width: min(100%, 900px);
+  justify-self: center;
+  text-align: center;
+}
+
 .live-data-intro h2 em {
   color: var(--green-3);
 }
 
 .live-data-intro > p {
   max-width: 520px;
+  margin-inline: auto;
   color: var(--muted);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 18px;
@@ -1415,6 +1422,7 @@ footer span {
   align-items: center;
   gap: 10px;
   margin-top: 20px;
+  justify-content: center;
 }
 
 .live-data-button {
@@ -1460,6 +1468,8 @@ footer span {
 }
 
 .proposal-panel {
+  width: min(100%, 1000px);
+  justify-self: center;
   min-height: 390px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1758,6 +1768,13 @@ footer span {
   line-height: 1.55;
 }
 
+.analysis-report-header .analysis-result-summary {
+  max-width: 620px;
+  color: var(--green-2);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
 .robustness-badge {
   min-width: 180px;
   border: 1px solid var(--line);
@@ -1908,6 +1925,29 @@ footer span {
 
 .timing-signal {
   grid-column: span 2;
+}
+
+.secondary-signals {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+}
+
+.secondary-signals > summary {
+  padding: 14px 16px;
+  color: var(--green-2);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.secondary-signal-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  padding: 10px;
 }
 
 .flexgov-counterfactuals {
@@ -2453,8 +2493,12 @@ footer span {
     grid-template-columns: 1fr 1fr;
   }
 
+  .secondary-signal-grid {
+    grid-template-columns: 1fr;
+  }
+
   .timing-signal {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 }
 

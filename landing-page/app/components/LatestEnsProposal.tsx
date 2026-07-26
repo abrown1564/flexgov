@@ -813,10 +813,16 @@ function FlexGovAnalysis({
       <header className="analysis-report-header">
         <div>
           <span className="analysis-eyebrow">FlexGov analysis report</span>
-          <h4>How was this outcome shaped?</h4>
-          <p>
-            Concentration, timing and mechanism sensitivity across{" "}
-            {analysis.voteIndex.toLocaleString()} ballots.
+          <h4>{label(outcomes[0]?.winner ?? null)} remains the result.</h4>
+          <p className="analysis-result-summary">
+            {signals.walletsFor50Pct.toLocaleString()} wallets hold half of cast
+            voting power, but the winner is{" "}
+            {robustness === "robust"
+              ? "unchanged across all four tested weighting rules"
+              : robustness === "rule-dependent"
+                ? "different under at least one tested weighting rule"
+                : "not classifiable across the tested weighting rules"}
+            .
           </p>
         </div>
         <div className={`robustness-badge robustness-${robustness}`}>
@@ -871,22 +877,27 @@ function FlexGovAnalysis({
           <dd>{signals.walletsFor50Pct}</dd>
           <small>Smallest coalition holding half of cast voting power</small>
         </div>
-        {signals.lateWeightShare !== null && (
-          <div className="signal-card">
-            <dt>Weight arriving late</dt>
-            <dd>{formatPct(signals.lateWeightShare)}</dd>
-            <small>Voting power cast in the final 10% of the voting window</small>
-          </div>
-        )}
-        <div className="signal-card timing-signal">
-          <dt>Votes sharing a second</dt>
-          <dd>{formatPct(signals.dupTimestampRatio)}</dd>
-          <small>Wallets sharing an exact cast timestamp with another wallet</small>
+      </div>
+
+      <details className="secondary-signals">
+        <summary>Timing signals and interpretation</summary>
+        <div className="secondary-signal-grid">
+          {signals.lateWeightShare !== null && (
+            <div className="signal-card">
+              <dt>Weight arriving late</dt>
+              <dd>{formatPct(signals.lateWeightShare)}</dd>
+              <small>Voting power cast in the final 10% of the voting window</small>
+            </div>
+          )}
+          <div className="signal-card timing-signal">
+            <dt>Votes sharing a second</dt>
+            <dd>{formatPct(signals.dupTimestampRatio)}</dd>
+            <small>Wallets sharing an exact cast timestamp with another wallet</small>
           {/* Native details/summary keeps the methodology available by click
               and keyboard without letting a long caveat dominate the report. */}
-          <details className="timing-method-note">
-            <summary>How should this be interpreted?</summary>
-            <div>
+            <details className="timing-method-note">
+              <summary>How should this be interpreted?</summary>
+              <div>
               {signals.expectedDupTimestampRatio != null &&
                 signals.dupTimestampLift != null && (
                   <p>
@@ -952,10 +963,11 @@ function FlexGovAnalysis({
                   Later: wallet age, funding links and historical behaviour
                 </li>
               </ul>
-            </div>
-          </details>
+              </div>
+            </details>
+          </div>
         </div>
-      </div>
+      </details>
 
       <div className="report-section-heading">
         <span>02</span>
